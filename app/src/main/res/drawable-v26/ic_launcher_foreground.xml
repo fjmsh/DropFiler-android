@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="utf-8"?>
-<!-- Adaptive launcher icon foreground: the white DropFiler symbol on the 108 dp canvas.
+<!-- Adaptive launcher icon foreground: the light-blue DropFiler symbol on the 108 dp canvas.
 	 The 27.5% inset leaves the symbol 48.6 dp wide; its farthest stroke edge is 30.2 dp from
 	 the centre, inside the 33 dp (66 dp diameter) safe zone of every launcher mask.
 	 Fractional insets need API 26, the first release with adaptive icons. -->

@@ -29,15 +29,10 @@
 	<string name="credits_version">v%1$s</string>
 	<string name="title_activity_credits">&appname; について</string>
 	<string name="logo_description">ロゴ</string>
-	<string name="credits_creator">どこにでも保存。手間なく整理。\n\nモダンな Android ファイル保存ユーティリティ。<a href="https://github.com/ScreamingHawk">&author;</a> によるアプリ「Phone Saver」をベースにしています</string>
-	<string name="credits_content1">&appname; は共有機能または「アプリで開く」を通じてファイルのコピーを電話に保存する
-		シンプルなアプリケーションです。</string>
-	<string name="credits_content2">&appname; は、&author; (ScreamingHawk) が開発した Phone Saver を別ブランドとしてフォークしたものです。
-		オリジナルのプロジェクトは <a href="https://github.com/ScreamingHawk/phone-saver">github.com/ScreamingHawk/phone-saver</a>
-		で公開されています。オリジナルのコードには引き続き MIT ライセンスが適用されます。</string>
-	<string name="credits_content3">このアプリケーションは完全にオープンソースです。
-		<a href="https://tldrlegal.com/license/mit-license">MIT ライセンス</a> でライセンスされます。
-	</string>
+	<string name="credits_creator">どこにでも保存。手間なく整理。\n\nモダンな Android ファイル保存ユーティリティ</string>
+	<string name="credits_content1">&appname; は、ファイルの「共有」機能と「開く」機能を通じて、ファイルのコピーを電話に保存するためのシンプルなアプリケーションです。</string>
+	<string name="credits_content2">&appname; は、&author; が開発した Phone Saver のフォークです。オリジナルのプロジェクトは <a href="https://github.com/ScreamingHawk/phone-saver">github.com/ScreamingHawk/phone-saver</a> で公開されています。</string>
+	<string name="credits_content3">このアプリケーションはオープンソースで、<a href="https://tldrlegal.com/license/mit-license">MIT ライセンス</a> でライセンスされています。</string>
 	<string name="credits_content_translator">この Phone Saver の翻訳は
 		<a href="https://github.com/naofum">Naofumi Fukue</a> によって提供されています。
 	</string>

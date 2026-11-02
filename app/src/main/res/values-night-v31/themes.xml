@@ -8,8 +8,5 @@
 		<item name="fsColorLink">@android:color/system_accent1_200</item>
 		<item name="fsColorSecondaryActionContainer">@android:color/system_accent3_700</item>
 		<item name="fsColorOnSecondaryActionContainer">@android:color/system_accent3_100</item>
-		<!-- accent1_600 is under 3:1 against the #131313 background; one tone lighter of the
-			 same accent keeps the title icon legible (fsColorAccent stays the button color). -->
-		<item name="fsColorTitleIcon">@android:color/system_accent1_500</item>
 	</style>
 </resources>

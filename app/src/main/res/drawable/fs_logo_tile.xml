@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- About screen logo background: the launcher icon background colour with the corner ratio of
+	 fs_icon_tile (the main screen's destination icons). -->
+<shape xmlns:android="http://schemas.android.com/apk/res/android"
+	android:shape="rectangle">
+	<corners android:radius="@dimen/fs_logo_radius" />
+	<solid android:color="@color/ic_launcher_background" />
+</shape>

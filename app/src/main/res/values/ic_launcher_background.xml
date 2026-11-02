@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-	<!-- Solid charcoal launcher icon background -->
-	<color name="ic_launcher_background">#242424</color>
+	<!-- Launcher icon colours: the dark-theme folder tile (fs_accent_container) and
+		 folder glyph (fs_on_accent_container) from values-night/colors.xml -->
+	<color name="ic_launcher_background">#1E2A43</color>
+	<color name="ic_launcher_foreground">#A9C6FF</color>
 </resources>

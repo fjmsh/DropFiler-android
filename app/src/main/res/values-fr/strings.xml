@@ -38,16 +38,10 @@
 	<string name="credits_version">v%1$s</string>
 	<string name="title_activity_credits">A propos de &appname;</string>
 	<string name="logo_description">Logo</string>
-	<string name="credits_creator">Enregistrez partout. Organisez sans effort.\n\nUn utilitaire Android moderne d\'enregistrement de fichiers, basé sur l\'application « Phone Saver » de <a href="https://github.com/ScreamingHawk">&author;</a></string>
-	<string name="credits_content1">&appname; est une simple application pour sauvegarder des copies de
-		fichiers sur votre téléphone via la fonctionnalité partager ou \"Ouvrir avec\".</string>
-	<string name="credits_content2">&appname; est un fork distinct de Phone Saver, développé à l\'origine par
-		&author; (ScreamingHawk). Le projet original est disponible sur
-		<a href="https://github.com/ScreamingHawk/phone-saver">github.com/ScreamingHawk/phone-saver</a>. Le code original reste
-		soumis à sa licence MIT.</string>
-	<string name="credits_content3">Cette application est complètement open source; elle a pour license la
-		<a href="https://tldrlegal.com/license/mit-license">license MIT</a>.
-	</string>
+	<string name="credits_creator">Enregistrez partout. Organisez sans effort.\n\nUn utilitaire Android moderne d\'enregistrement de fichiers</string>
+	<string name="credits_content1">&appname; est une application simple pour enregistrer des copies de fichiers sur votre téléphone via les fonctions « partager » et « ouvrir ».</string>
+	<string name="credits_content2">&appname; est un fork de Phone Saver, développé à l\'origine par &author;. Le projet original est disponible sur <a href="https://github.com/ScreamingHawk/phone-saver">github.com/ScreamingHawk/phone-saver</a>.</string>
+	<string name="credits_content3">Cette application est open source ; elle est distribuée sous <a href="https://tldrlegal.com/license/mit-license">licence MIT</a>.</string>
 	<string name="credits_content_translator">Cette traduction de Phone Saver a été proposée par
 		<a href="https://github.com/Paulao17">Paul Alnet</a>.
 	</string>

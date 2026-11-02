@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.widget.TextView
 import androidx.core.widget.TextViewCompat
@@ -13,6 +14,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hchen.himiuix.MiuixAppBar
 import fjm.sh.dropfiler.TestSupport.context
 import fjm.sh.dropfiler.TestSupport.prefs
+import fjm.sh.dropfiler.activity.CreditsActivity
 import fjm.sh.dropfiler.activity.FolderListActivity
 import fjm.sh.dropfiler.ui.AppBarTitleIcon
 import fjm.sh.dropfiler.util.ThemeHelper
@@ -70,7 +72,7 @@ class AppIconTest {
 		assertEquals((28 * density).toInt(), icon.bounds.width())
 		assertEquals((10 * density).toInt(), title.compoundDrawablePadding)
 		// Robolectric can only rasterise with native graphics from API 26
-		if (Build.VERSION.SDK_INT >= 26) assertEquals(activity.getColor(R.color.fs_accent), drawnColor(icon))
+		if (Build.VERSION.SDK_INT >= 26) assertEquals(activity.getColor(R.color.fs_on_accent_container), drawnColor(icon))
 	}
 
 	@Test
@@ -90,43 +92,45 @@ class AppIconTest {
 	fun mainTitle_followsDynamicColors() {
 		prefs.edit().putBoolean(ThemeHelper.PREF_DYNAMIC_COLORS, true).commit()
 		val activity = Robolectric.buildActivity(FolderListActivity::class.java).setup().get()
-		assertEquals(activity.getColor(android.R.color.system_accent1_600), drawnColor(titleIcon(activity)))
+		assertEquals(activity.getColor(android.R.color.system_accent1_700), drawnColor(titleIcon(activity)))
 	}
 
 	@Test
 	@Config(sdk = [31, 36], qualifiers = "night")
-	fun mainTitle_dynamicColorsInDarkThemeUseLighterAccentTone() {
+	fun mainTitle_dynamicColorsInDarkThemeMatchFolderIcons() {
 		prefs.edit().putBoolean(ThemeHelper.PREF_DYNAMIC_COLORS, true).commit()
 		val activity = Robolectric.buildActivity(FolderListActivity::class.java).setup().get()
-		assertEquals(activity.getColor(android.R.color.system_accent1_500), drawnColor(titleIcon(activity)))
+		assertEquals(activity.getColor(android.R.color.system_accent1_100), drawnColor(titleIcon(activity)))
 	}
 
 	@Test
 	@Config(sdk = [28, 36], qualifiers = "night")
-	fun mainTitle_defaultDarkThemeUsesDefaultAccent() {
+	fun mainTitle_defaultDarkThemeMatchesFolderIcons() {
 		val activity = Robolectric.buildActivity(FolderListActivity::class.java).setup().get()
-		assertEquals(activity.getColor(R.color.fs_accent), drawnColor(titleIcon(activity)))
+		assertEquals(0xFFA9C6FF.toInt(), drawnColor(titleIcon(activity)))
 	}
 
 	@Test
 	@Config(sdk = [31, 36])
 	fun mainTitle_updatesWhenAppearanceChanges() {
 		val controller = Robolectric.buildActivity(FolderListActivity::class.java).setup()
-		assertEquals(controller.get().getColor(R.color.fs_accent), drawnColor(titleIcon(controller.get())))
+		assertEquals(controller.get().getColor(R.color.fs_on_accent_container), drawnColor(titleIcon(controller.get())))
 		// Settings change dynamic colours; BaseActivity recreates the screen when it resumes
 		prefs.edit().putBoolean(ThemeHelper.PREF_DYNAMIC_COLORS, true).commit()
 		controller.recreate()
-		assertEquals(controller.get().getColor(android.R.color.system_accent1_600),
+		assertEquals(controller.get().getColor(android.R.color.system_accent1_700),
 			drawnColor(titleIcon(controller.get())))
 	}
 
 	@Test
 	@Config(sdk = [26, 33, 36])
-	fun launcherIcon_isAdaptiveWithCharcoalBackground() {
+	fun launcherIcon_isAdaptiveWithFolderIconColors() {
 		for (id in listOf(R.mipmap.ic_launcher, R.mipmap.ic_launcher_round)) {
 			val icon = context.getDrawable(id) as AdaptiveIconDrawable
-			assertEquals(0xFF242424.toInt(), (icon.background as ColorDrawable).color)
+			assertEquals(0xFF1E2A43.toInt(), (icon.background as ColorDrawable).color)
 			assertNotNull(icon.foreground)
+			icon.foreground.setBounds(0, 0, 216, 216)
+			assertEquals(0xFFA9C6FF.toInt(), drawnColor(icon.foreground))
 			if (Build.VERSION.SDK_INT >= 33) assertNotNull(icon.monochrome)
 		}
 	}
@@ -136,5 +140,22 @@ class AppIconTest {
 	fun launcherIcon_usesLegacyBitmapsBeforeAndroid8() {
 		assertTrue(context.getDrawable(R.mipmap.ic_launcher) is android.graphics.drawable.BitmapDrawable)
 		assertTrue(context.getDrawable(R.mipmap.ic_launcher_round) is android.graphics.drawable.BitmapDrawable)
+	}
+
+	@Test
+	@Config(sdk = [28, 36])
+	fun aboutLogo_usesIconTileCornerRatio() {
+		val activity = Robolectric.buildActivity(CreditsActivity::class.java).setup().get()
+		val logo = activity.findViewById<android.widget.ImageView>(R.id.credits_logo)
+		val tile = logo.background as GradientDrawable
+		val res = context.resources
+		// The logo radius has the same ratio to its size as the icon tiles (12dp on 40dp)
+		val logoRatio = res.getDimension(R.dimen.fs_logo_radius) / res.getDimension(R.dimen.fs_logo_size)
+		val tileRatio = res.getDimension(R.dimen.fs_icon_tile_radius) / res.getDimension(R.dimen.fs_icon_tile)
+		assertEquals(tileRatio, logoRatio, 0.001f)
+		// and the tile uses it. <corners> radii are read as whole pixels (26.4dp is 26px at mdpi).
+		assertEquals(res.getDimensionPixelSize(R.dimen.fs_logo_radius).toFloat(), tile.cornerRadius, 0f)
+		assertEquals(0xFF1E2A43.toInt(), tile.color!!.defaultColor)
+		assertNotNull(logo.drawable)
 	}
 }

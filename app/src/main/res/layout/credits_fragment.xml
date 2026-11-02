@@ -30,11 +30,16 @@
 				android:orientation="vertical"
 				android:padding="24dp">
 
+				<!-- The launcher icon's colours and symbol, drawn as a rounded square with the same
+					 corner ratio as the main screen's icon tiles instead of the launcher mask -->
 				<ImageView
+					android:id="@+id/credits_logo"
 					android:layout_width="@dimen/fs_logo_size"
 					android:layout_height="@dimen/fs_logo_size"
+					android:background="@drawable/fs_logo_tile"
 					android:contentDescription="@string/logo_description"
-					android:src="@mipmap/ic_launcher" />
+					android:padding="@dimen/fs_logo_padding"
+					app:srcCompat="@drawable/ic_dropfiler_symbol" />
 
 				<TextView
 					android:id="@+id/credits_app_name"

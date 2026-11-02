@@ -46,17 +46,10 @@
 	<string name="credits_version">v%1$s</string>
 	<string name="title_activity_credits">About &appname;</string>
 	<string name="logo_description">Logo</string>
-	<string name="credits_creator">Save anywhere. Organize effortlessly.\n\nA modern Android file-saving utility, based on the app \"Phone Saver\" by <a href="https://github.com/ScreamingHawk">&author;</a></string>
-	<string name="credits_content1">&appname; is a simple application for saving copies of files to your
-		phone through the share feature or \"Open with\".
-	</string>
-	<string name="credits_content2">&appname; is a separately branded fork of Phone Saver, originally developed by
-		&author; (ScreamingHawk). The original project is available at
-		<a href="https://github.com/ScreamingHawk/phone-saver">github.com/ScreamingHawk/phone-saver</a>. Original code remains
-		subject to its applicable MIT License.</string>
-	<string name="credits_content3">This application is completely open source; it is licensed under the
-		<a href="https://tldrlegal.com/license/mit-license">MIT license</a>.
-	</string>
+	<string name="credits_creator">Save anywhere. Organize effortlessly.\n\nA modern Android file-saving utility</string>
+	<string name="credits_content1">&appname; is a simple application for saving copies of files to your phone through the file \"share\" and \"open\" functions.</string>
+	<string name="credits_content2">&appname; is a fork of Phone Saver, originally developed by &author;. The original project is available at <a href="https://github.com/ScreamingHawk/phone-saver">github.com/ScreamingHawk/phone-saver</a>.</string>
+	<string name="credits_content3">This application is open-source; it is licensed under the <a href="https://tldrlegal.com/license/mit-license">MIT license</a>.</string>
 	<string name="credits_content_translator">This translation of Phone Saver was provided by
 		<a href="https://michael.standen.link">&author;</a>.
 	</string>
