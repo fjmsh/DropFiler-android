@@ -149,9 +149,12 @@ class AppIconTest {
 		val logo = activity.findViewById<android.widget.ImageView>(R.id.credits_logo)
 		val tile = logo.background as GradientDrawable
 		val res = context.resources
-		val logoRatio = tile.cornerRadius / res.getDimension(R.dimen.fs_logo_size)
+		// The logo radius has the same ratio to its size as the icon tiles (12dp on 40dp)
+		val logoRatio = res.getDimension(R.dimen.fs_logo_radius) / res.getDimension(R.dimen.fs_logo_size)
 		val tileRatio = res.getDimension(R.dimen.fs_icon_tile_radius) / res.getDimension(R.dimen.fs_icon_tile)
 		assertEquals(tileRatio, logoRatio, 0.001f)
+		// and the tile uses it. <corners> radii are read as whole pixels (26.4dp is 26px at mdpi).
+		assertEquals(res.getDimensionPixelSize(R.dimen.fs_logo_radius).toFloat(), tile.cornerRadius, 0f)
 		assertEquals(0xFF1E2A43.toInt(), tile.color!!.defaultColor)
 		assertNotNull(logo.drawable)
 	}
