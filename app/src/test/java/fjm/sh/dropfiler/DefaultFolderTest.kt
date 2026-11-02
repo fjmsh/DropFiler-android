@@ -8,18 +8,20 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hchen.himiuix.preference.MiuixPreferenceCategory
 import com.hchen.himiuix.preference.MiuixSwitchPreference
+import fjm.sh.dropfiler.TestSupport.addFolders
 import fjm.sh.dropfiler.TestSupport.context
+import fjm.sh.dropfiler.TestSupport.downloads
+import fjm.sh.dropfiler.TestSupport.folderFile
+import fjm.sh.dropfiler.TestSupport.hideDefault
 import fjm.sh.dropfiler.TestSupport.prefs
-import fjm.sh.dropfiler.TestSupport.root
-import fjm.sh.dropfiler.TestSupport.setDestinations
 import fjm.sh.dropfiler.TestSupport.waitFor
 import fjm.sh.dropfiler.activity.FolderListActivity
-import fjm.sh.dropfiler.activity.FolderSelectActivity
 import fjm.sh.dropfiler.activity.SaverActivity
 import fjm.sh.dropfiler.activity.SettingsActivity
+import fjm.sh.dropfiler.destination.DestinationRepository
+import fjm.sh.dropfiler.destination.DestinationRepository.DEFAULT_ID
 import fjm.sh.dropfiler.ui.CardItem
 import fjm.sh.dropfiler.ui.CardListAdapter
-import fjm.sh.dropfiler.util.LocationHelper
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
@@ -27,30 +29,25 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 import org.robolectric.Robolectric
-import org.robolectric.Shadows.shadowOf
 import org.robolectric.annotation.Config
 import org.robolectric.shadows.ShadowToast
 import java.io.File
 
 /**
- * The built-in, non-removable "DropFiler" (/DropFiler) destination and the setting that
- * hides it while other destinations exist.
+ * The built-in, non-removable "Download" destination (Internal storage/Download, written
+ * through MediaStore.Downloads on Android 10+) and the setting that hides it while other
+ * usable destinations exist.
  */
 @RunWith(AndroidJUnit4::class)
 @Config(sdk = [23, 28, 29, 34, 36])
 class DefaultFolderTest {
 
+	private val download get() = context.getString(R.string.default_destination_label)
+
 	@Before
 	fun setUp() {
-		root().listFiles()?.forEach { it.deleteRecursively() }
-		prefs.edit().clear().commit()
-		de.cketti.library.changelog.ChangeLog(context).skipLogDialog()
-		// Fresh install: no FOLDER_STORE file at all
-		File(context.filesDir, "FOLDER_STORE").delete()
+		TestSupport.reset()
 	}
-
-	private fun hide(hidden: Boolean) =
-		prefs.edit().putBoolean(LocationHelper.PREF_HIDE_DEFAULT_FOLDER, hidden).commit()
 
 	private fun share(text: String) = Robolectric.buildActivity(SaverActivity::class.java,
 		Intent(context, SaverActivity::class.java).setAction(Intent.ACTION_SEND)
@@ -63,87 +60,109 @@ class DefaultFolderTest {
 		(activity.findViewById<RecyclerView>(R.id.list).adapter as CardListAdapter).items.filterIsInstance<CardItem.Row>()
 
 	private fun launchMain(): FolderListActivity =
-		Robolectric.buildActivity(FolderListActivity::class.java).setup().get().also { TestSupport.idle() }
+		Robolectric.buildActivity(FolderListActivity::class.java).setup().get().also { waitFor(300) { false } }
 
 	// Destination list ---------------------------------------------------------------------
 
 	@Test
-	fun destinations_defaultFolderFirst_hiddenOnlyWhenOthersExist() {
-		assertEquals(listOf("/DropFiler"), LocationHelper.destinations(context, emptyList()))
-		assertEquals(listOf("/DropFiler", "/A"), LocationHelper.destinations(context, listOf("/A")))
-		hide(true)
-		assertEquals(listOf("/A", "/B"), LocationHelper.destinations(context, listOf("/A", "/B")))
-		// Hidden, but there is nothing else: still offered
-		assertEquals(listOf("/DropFiler"), LocationHelper.destinations(context, emptyList()))
-		// Never listed twice, even if it was stored by an older build
-		hide(false)
-		assertEquals(listOf("/DropFiler", "/A"), LocationHelper.destinations(context, listOf("/DropFiler", "/A")))
+	fun destinations_defaultFirst_hiddenOnlyWhenOthersAreUsable() {
+		fun ids() = DestinationRepository.offered(context).map { it.id }
+		assertEquals(listOf(DEFAULT_ID), ids())
+		val (a, b) = addFolders("A", "B")
+		assertEquals(listOf(DEFAULT_ID, a.id, b.id), ids())
+		hideDefault()
+		assertEquals(listOf(a.id, b.id), ids())
+		// Hidden, but the other destinations lost their access: Download is offered again
+		TestSupport.revoke(a)
+		TestSupport.revoke(b)
+		assertEquals(listOf(DEFAULT_ID, a.id, b.id), ids())
+		assertEquals("Internal storage/Download", context.getString(R.string.default_destination_path))
 	}
 
 	// Sharing ------------------------------------------------------------------------------
 
 	@Test
-	fun freshInstall_sharingSavesToDropFilerFolder_insteadOfAnError() {
+	fun freshInstall_sharingSavesToDownload_withoutAnySetup() {
 		val controller = share("first share")
-		val saved = File(root(), "DropFiler/firstshare.txt")
+		val saved = File(downloads(), "firstshare.txt")
 		assertTrue("saved without asking", waitFor { saved.length() > 0 })
 		assertEquals("first share", saved.readText())
+		assertFalse("not in a DropFiler sub folder", File(downloads(), "DropFiler").exists())
+		assertFalse("not in the old root folder", File(TestSupport.root(), "DropFiler").exists())
 		assertTrue(waitFor { controller.get().isFinishing })
 		assertEquals(context.getString(R.string.toast_save_successful), ShadowToast.getTextOfLatestToast())
+		if (android.os.Build.VERSION.SDK_INT >= 29) {
+			// Through MediaStore, not a file path; published after writing
+			assertEquals(listOf("firstshare.txt"), FakeMediaStore.publishedNames())
+			assertEquals(listOf(true), FakeMediaStore.pendingAtWrite)
+		}
 	}
 
 	@Test
-	fun withOtherDestinations_sheetOffersDropFilerFirst() {
-		setDestinations("/A")
+	fun withOtherDestinations_sheetOffersDownloadFirst() {
+		addFolders("A")
 		val activity = share("pick").get()
 		assertTrue(waitFor { activity.findViewById<View>(R.id.list).visibility == View.VISIBLE })
 		val rows = sheetRows(activity)
-		assertEquals(listOf("DropFiler", "A"), rows.map { it.title.toString() })
-		// Not created yet, but it is created when needed, so it can be chosen
+		assertEquals(listOf(download, "A"), rows.map { it.title.toString() })
+		assertEquals("Internal storage/Download", rows[0].summary)
 		assertTrue(rows[0].enabled)
 	}
 
 	@Test
 	fun hidden_withOtherDestinations_sheetLeavesItOut() {
-		hide(true)
-		setDestinations("/A", "/B")
+		hideDefault()
+		addFolders("A", "B")
 		val activity = share("pick").get()
 		assertTrue(waitFor { activity.findViewById<View>(R.id.list).visibility == View.VISIBLE })
 		assertEquals(listOf("A", "B"), sheetRows(activity).map { it.title.toString() })
 	}
 
 	@Test
-	fun hidden_withoutOtherDestinations_stillSavesToDropFiler() {
-		hide(true)
+	fun hidden_withoutOtherDestinations_stillSavesToDownload() {
+		hideDefault()
 		share("still here")
-		assertTrue(waitFor { File(root(), "DropFiler/stillhere.txt").length() > 0 })
+		assertTrue(waitFor { File(downloads(), "stillhere.txt").length() > 0 })
 	}
 
 	@Test
-	fun deletedDropFilerFolder_isCreatedAgain() {
-		File(root(), "DropFiler").apply { mkdirs() }.deleteRecursively()
-		share("again")
-		assertTrue(waitFor { File(root(), "DropFiler/again.txt").length() > 0 })
+	fun hidden_whenAllOtherDestinationsBroke_offersDownloadAsRecovery() {
+		hideDefault()
+		val (a) = addFolders("A")
+		TestSupport.revoke(a)
+		val activity = share("rescue").get()
+		assertTrue(waitFor { activity.findViewById<View>(R.id.list).visibility == View.VISIBLE })
+		val rows = sheetRows(activity)
+		assertEquals(context.getString(R.string.saver_missing_title), rows[0].title)
+		assertTrue(rows.first { it.title == download }.enabled)
+		assertFalse(rows.first { it.title == "A" }.enabled)
+		val list = activity.findViewById<RecyclerView>(R.id.list)
+		list.measure(View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY),
+			View.MeasureSpec.makeMeasureSpec(4000, View.MeasureSpec.AT_MOST))
+		list.layout(0, 0, 1080, list.measuredHeight)
+		val position = (list.adapter as CardListAdapter).items.indexOfFirst { it is CardItem.Row && it.title == download }
+		list.findViewHolderForAdapterPosition(position)!!.itemView.findViewById<View>(R.id.row).performClick()
+		assertTrue(waitFor { File(downloads(), "rescue.txt").length() > 0 })
 	}
 
 	@Test
-	fun openWith_withoutDestinations_savesToDropFiler() {
+	fun openWith_withoutDestinations_savesToDownload() {
 		val file = File(context.cacheDir, "doc.txt").apply { writeText("viewed") }
 		Robolectric.buildActivity(SaverActivity::class.java, Intent(context, SaverActivity::class.java)
 			.setAction(Intent.ACTION_VIEW).setDataAndType(android.net.Uri.fromFile(file), "text/plain")).setup()
-		assertTrue(waitFor { File(root(), "DropFiler").listFiles()?.any { it.name.endsWith("doc.txt") } == true })
+		assertTrue(waitFor { TestSupport.downloadedFiles().any { it.name.endsWith("doc.txt") } })
 	}
 
 	// Main screen --------------------------------------------------------------------------
 
 	@Test
-	fun mainScreen_showsDropFilerFirst_notRemovableOrMovable() {
-		setDestinations("/A", "/B")
+	fun mainScreen_showsDownloadFirst_notRemovableOrMovable() {
+		val (a, b) = addFolders("A", "B")
 		val rows = mainRows(launchMain())
-		assertEquals(listOf("/DropFiler", "/A", "/B"), rows.map { it.key })
+		assertEquals(listOf(DEFAULT_ID, a.id, b.id), rows.map { it.key })
 		val default = rows[0]
-		assertEquals("DropFiler", default.title)
-		assertEquals(context.getString(R.string.folder_list_default_summary, "/DropFiler"), default.summary)
+		assertEquals(download, default.title)
+		assertEquals(context.getString(R.string.folder_list_default_summary, "Internal storage/Download"), default.summary)
 		assertEquals("no delete button", 0, default.actionIcon)
 		assertFalse("no drag handle", default.draggable)
 		assertTrue(rows.drop(1).all { it.draggable && it.actionIcon != 0 })
@@ -151,28 +170,28 @@ class DefaultFolderTest {
 
 	@Test
 	fun mainScreen_hidden_onlyWhenOthersExist() {
-		hide(true)
-		setDestinations("/A")
-		assertEquals(listOf("/A"), mainRows(launchMain()).map { it.key })
-		LocationHelper.saveFolderList(context, mutableListOf())
-		assertEquals(listOf("/DropFiler"), mainRows(launchMain()).map { it.key })
+		hideDefault()
+		val (a) = addFolders("A")
+		assertEquals(listOf(a.id), mainRows(launchMain()).map { it.key })
+		DestinationRepository.remove(context, a.id)
+		assertEquals(listOf(DEFAULT_ID), mainRows(launchMain()).map { it.key })
 	}
 
 	@Test
 	fun mainScreen_followsTheSettingOnResume() {
-		setDestinations("/A")
+		val (a) = addFolders("A")
 		val controller = Robolectric.buildActivity(FolderListActivity::class.java).setup()
-		assertEquals(listOf("/DropFiler", "/A"), mainRows(controller.get()).map { it.key })
-		hide(true)
+		assertEquals(listOf(DEFAULT_ID, a.id), mainRows(controller.get()).map { it.key })
+		hideDefault()
 		controller.pause().resume()
 		TestSupport.idle()
-		assertEquals(listOf("/A"), mainRows(controller.get()).map { it.key })
+		assertEquals(listOf(a.id), mainRows(controller.get()).map { it.key })
 	}
 
 	@Test
-	fun removingTheLastDestination_leavesDropFiler_andIsNeverStored() {
-		hide(true)
-		setDestinations("/A")
+	fun removingTheLastDestination_leavesDownload_andIsNeverStored() {
+		hideDefault()
+		addFolders("A")
 		val activity = launchMain()
 		val list = activity.findViewById<RecyclerView>(R.id.list)
 		list.measure(View.MeasureSpec.makeMeasureSpec(1080, View.MeasureSpec.EXACTLY),
@@ -189,53 +208,50 @@ class DefaultFolderTest {
 		find(dialog.window!!.decorView)!!.performClick()
 		TestSupport.idle()
 
-		assertEquals(emptyList<String>(), LocationHelper.loadFolderList(context))
-		assertEquals(listOf("/DropFiler"), mainRows(activity).map { it.key })
-	}
-
-	@Test
-	@Suppress("DEPRECATION")
-	fun choosingDropFilerInTheFolderPicker_doesNotAddADuplicate() {
-		setDestinations("/A")
-		val activity = launchMain()
-		val result = Intent().putExtra(FolderSelectActivity.FOLDER_SELECTED, LocationHelper.addRoot("/DropFiler"))
-		val code = shadowOf(activity).run {
-			activity.findViewById<View>(R.id.fab).performClick()
-			nextStartedActivityForResult.requestCode
-		}
-		activity.onActivityResult(code, android.app.Activity.RESULT_OK, result)
-		assertEquals(listOf("/A"), LocationHelper.loadFolderList(context))
-		assertEquals(listOf("/DropFiler", "/A"), mainRows(activity).map { it.key })
-
-		// When hidden, explain how to show it instead of silently doing nothing
-		hide(true)
-		activity.onActivityResult(code, android.app.Activity.RESULT_OK, result)
-		assertEquals(listOf("/A"), LocationHelper.loadFolderList(context))
-		assertEquals(context.getString(R.string.toast_default_folder_hidden), ShadowToast.getTextOfLatestToast())
+		assertEquals(emptyList<Any>(), DestinationRepository.custom(context))
+		assertFalse(File(context.filesDir, fjm.sh.dropfiler.destination.DestinationStore.FILE_NAME).readText().contains(DEFAULT_ID))
+		assertEquals(listOf(DEFAULT_ID), mainRows(activity).map { it.key })
+		// The folder access was given up
+		assertTrue(context.contentResolver.persistedUriPermissions.isEmpty())
 	}
 
 	// Direct Share -------------------------------------------------------------------------
 
 	@Test
 	@Config(sdk = [29, 34, 36])
-	fun directShare_includesDropFiler_unlessHidden() {
-		setDestinations("/A")
-		fun published() = ShortcutManagerCompat.getDynamicShortcuts(context).map { it.id }
-		assertEquals(listOf("folder:/DropFiler", "folder:/A"), published())
-		hide(true)
-		LocationHelper.saveFolderList(context, mutableListOf("/A"))
-		assertEquals(listOf("folder:/A"), published())
+	fun directShare_includesDownload_unlessHidden() {
+		val (a) = addFolders("A")
+		fun published() = ShortcutManagerCompat.getDynamicShortcuts(context).sortedBy { it.rank }.map { it.id }
+		assertEquals(listOf("dest:$DEFAULT_ID", "dest:${a.id}"), published())
+		hideDefault()
+		DirectShareHelperAccess.publish()
+		assertEquals(listOf("dest:${a.id}"), published())
 	}
 
 	@Test
 	@Config(sdk = [29, 34, 36])
-	fun directShare_toDropFiler_savesThere() {
-		setDestinations("/A")
+	fun directShare_toDownload_savesThere() {
+		addFolders("A")
 		Robolectric.buildActivity(SaverActivity::class.java,
 			Intent(context, SaverActivity::class.java).setAction(Intent.ACTION_SEND).setType("text/plain")
-				.putExtra(Intent.EXTRA_TEXT, "direct").putExtra(ShortcutManagerCompat.EXTRA_SHORTCUT_ID, "folder:/DropFiler")).setup()
-		assertTrue(waitFor { File(root(), "DropFiler/direct.txt").length() > 0 })
-		assertFalse(File(root(), "A/direct.txt").exists())
+				.putExtra(Intent.EXTRA_TEXT, "direct").putExtra(ShortcutManagerCompat.EXTRA_SHORTCUT_ID, "dest:$DEFAULT_ID")).setup()
+		assertTrue(waitFor { File(downloads(), "direct.txt").length() > 0 })
+		assertFalse(folderFile("A/direct.txt").exists())
+	}
+
+	@Test
+	@Config(sdk = [29, 36])
+	fun oldDropFilerShortcut_savesToDownload() {
+		// DropFiler 6.x shortcut id for the old built-in folder
+		Robolectric.buildActivity(SaverActivity::class.java,
+			Intent(context, SaverActivity::class.java).setAction(Intent.ACTION_SEND).setType("text/plain")
+				.putExtra(Intent.EXTRA_TEXT, "old").putExtra(ShortcutManagerCompat.EXTRA_SHORTCUT_ID, "folder:/DropFiler")).setup()
+		assertTrue(waitFor { File(downloads(), "old.txt").length() > 0 })
+		assertFalse(File(TestSupport.root(), "DropFiler").exists())
+	}
+
+	private object DirectShareHelperAccess {
+		fun publish() = fjm.sh.dropfiler.util.DirectShareHelper.publish(context)
 	}
 
 	// Settings -----------------------------------------------------------------------------
@@ -245,26 +261,26 @@ class DefaultFolderTest {
 		val activity = Robolectric.buildActivity(SettingsActivity::class.java).setup().get()
 		TestSupport.idle()
 		val fragment = activity.supportFragmentManager.fragments.filterIsInstance<PreferenceFragmentCompat>().single()
-		val switch = fragment.findPreference<MiuixSwitchPreference>(LocationHelper.PREF_HIDE_DEFAULT_FOLDER)!!
-		assertEquals("Hide \"DropFiler\" save location", switch.title.toString())
+		val switch = fragment.findPreference<MiuixSwitchPreference>(DestinationRepository.PREF_HIDE_DEFAULT_FOLDER)!!
+		assertEquals("Hide \"Download\" save location", switch.title.toString())
 		assertFalse(switch.isChecked)
 		val saving = fragment.findPreference<MiuixPreferenceCategory>("category_saving")!!
 		assertTrue((0 until saving.preferenceCount).any { saving.getPreference(it) === switch })
 		// Opening Settings writes nothing
-		assertFalse(prefs.contains(LocationHelper.PREF_HIDE_DEFAULT_FOLDER))
+		assertFalse(prefs.contains(DestinationRepository.PREF_HIDE_DEFAULT_FOLDER))
 	}
 
 	@Test
 	@Config(sdk = [29, 34, 36])
 	fun settings_toggle_updatesDirectShare() {
-		setDestinations("/A")
+		val (a) = addFolders("A")
 		val activity = Robolectric.buildActivity(SettingsActivity::class.java).setup().get()
 		TestSupport.idle()
 		val fragment = activity.supportFragmentManager.fragments.filterIsInstance<PreferenceFragmentCompat>().single()
-		val switch = fragment.findPreference<MiuixSwitchPreference>(LocationHelper.PREF_HIDE_DEFAULT_FOLDER)!!
+		val switch = fragment.findPreference<MiuixSwitchPreference>(DestinationRepository.PREF_HIDE_DEFAULT_FOLDER)!!
 		(switch as com.hchen.himiuix.callback.OnStateChangeListener).onStateChange(true)
 		TestSupport.idle()
-		assertTrue(prefs.getBoolean(LocationHelper.PREF_HIDE_DEFAULT_FOLDER, false))
-		assertEquals(listOf("folder:/A"), ShortcutManagerCompat.getDynamicShortcuts(context).map { it.id })
+		assertTrue(prefs.getBoolean(DestinationRepository.PREF_HIDE_DEFAULT_FOLDER, false))
+		assertEquals(listOf("dest:${a.id}"), ShortcutManagerCompat.getDynamicShortcuts(context).sortedBy { it.rank }.map { it.id })
 	}
 }

@@ -29,11 +29,11 @@ jobs:
       - name: Build debug APK
         run: ./gradlew assembleDebug
 
-      - name: Verify target SDK is still 28
+      - name: Verify target SDK is 36
         run: |
           AAPT2=$(ls -d "$ANDROID_HOME"/build-tools/*/aapt2 | sort -V | tail -1)
           "$AAPT2" dump badging app/build/outputs/apk/debug/app-debug.apk | grep -E "^package|sdkVersion|targetSdkVersion"
-          "$AAPT2" dump badging app/build/outputs/apk/debug/app-debug.apk | grep -q "targetSdkVersion:'28'"
+          "$AAPT2" dump badging app/build/outputs/apk/debug/app-debug.apk | grep -q "targetSdkVersion:'36'"
 
       - name: Rename APK
         run: |

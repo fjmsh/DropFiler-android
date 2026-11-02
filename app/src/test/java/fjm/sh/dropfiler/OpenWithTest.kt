@@ -19,8 +19,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import fjm.sh.dropfiler.TestSupport.context
 import fjm.sh.dropfiler.TestSupport.prefs
-import fjm.sh.dropfiler.TestSupport.root
-import fjm.sh.dropfiler.TestSupport.setDestinations
+import fjm.sh.dropfiler.TestSupport.addFolders
+import fjm.sh.dropfiler.TestSupport.folderFile
 import fjm.sh.dropfiler.TestSupport.waitFor
 import fjm.sh.dropfiler.activity.SaverActivity
 import fjm.sh.dropfiler.ui.CardItem
@@ -94,11 +94,10 @@ class OpenWithTest {
 
 	@Before
 	fun setUp() {
-		root().listFiles()?.forEach { it.deleteRecursively() }
-		prefs.edit().clear().commit()
-		// These tests are about the user's own destinations: hide the built-in DropFiler
-		// folder, which is then only used when there is no other destination (DefaultFolderTest)
-		prefs.edit().putBoolean(fjm.sh.dropfiler.util.LocationHelper.PREF_HIDE_DEFAULT_FOLDER, true).commit()
+		TestSupport.reset()
+		// These tests are about the user's own destinations: hide the built-in Download
+		// destination, which is then only used when no other destination works (DefaultFolderTest)
+		TestSupport.hideDefault()
 		TestProvider.entries.clear()
 		Robolectric.setupContentProvider(TestProvider::class.java, TestProvider.AUTHORITY)
 		shadowOf(MimeTypeMap.getSingleton()).apply {
@@ -155,7 +154,9 @@ class OpenWithTest {
 		assertEquals(context.getString(R.string.toast_open_with_unreadable), notification.text())
 	}
 
-	private fun savedFiles(): List<File> = root().walkTopDown().filter { it.isFile }.toList()
+	/** Everything saved anywhere: SAF folders and the Download root. */
+	private fun savedFiles(): List<File> = (TestDocumentsProvider.root.walkTopDown() + TestSupport.downloads().walkTopDown())
+		.filter { it.isFile }.toList()
 
 	// Intent resolution -------------------------------------------------------------------
 
@@ -207,12 +208,12 @@ class OpenWithTest {
 
 	@Test
 	fun openWith_singleDestination_savesCopyWithDisplayName() {
-		setDestinations("/Docs")
+		addFolders("Docs")
 		val bytes = Random.nextBytes(4096)
 		val file = source("report.pdf", bytes)
 		val controller = launch(viewIntent(provide("7", file, "Quarterly report.pdf", "application/pdf"), "application/pdf"))
 
-		val saved = File(root(), "Docs/Quarterlyreport.pdf")
+		val saved = folderFile("Docs/Quarterlyreport.pdf")
 		assertTrue(waitFor { saved.length() == bytes.size.toLong() })
 		assertArrayEquals(bytes, saved.readBytes())
 		// The source is copied, never changed or removed
@@ -223,7 +224,7 @@ class OpenWithTest {
 
 	@Test
 	fun openWith_multipleDestinations_showsSheet_andSavesToChosenFolder() {
-		setDestinations("/A", "/B")
+		addFolders("A", "B")
 		val bytes = "photo".toByteArray()
 		val activity = launch(viewIntent(provide("9", source("p.jpg", bytes), "holiday.jpg", "image/jpeg"), "image/jpeg")).get()
 
@@ -232,14 +233,14 @@ class OpenWithTest {
 		assertEquals(listOf("A", "B"), rows(activity).map { it.title.toString() })
 
 		clickRow(activity, "B")
-		assertTrue(waitFor { File(root(), "B/holiday.jpg").length() > 0 })
-		assertArrayEquals(bytes, File(root(), "B/holiday.jpg").readBytes())
-		assertFalse(File(root(), "A/holiday.jpg").exists())
+		assertTrue(waitFor { folderFile("B/holiday.jpg").length() > 0 })
+		assertArrayEquals(bytes, folderFile("B/holiday.jpg").readBytes())
+		assertFalse(folderFile("A/holiday.jpg").exists())
 	}
 
 	@Test
 	fun openWith_cancel_savesNothing_andLeavesSourceUnchanged() {
-		setDestinations("/A", "/B")
+		addFolders("A", "B")
 		val file = source("c.txt", "keep".toByteArray())
 		val activity = launch(viewIntent(provide("c", file, "c.txt", "text/plain"), "text/plain")).get()
 		assertTrue(waitFor { activity.findViewById<View>(R.id.list).visibility == View.VISIBLE })
@@ -252,7 +253,7 @@ class OpenWithTest {
 
 	@Test
 	fun openWith_variousTypes_areCopiedByteForByte() {
-		setDestinations("/In")
+		addFolders("In")
 		listOf(
 			Triple("archive.zip", "application/zip", "z"),
 			Triple("app.apk", "application/vnd.android.package-archive", "k"),
@@ -262,7 +263,7 @@ class OpenWithTest {
 		).forEach { (name, type, id) ->
 			val bytes = Random.nextBytes(1024)
 			launch(viewIntent(provide(id, source(name, bytes), name, type), type))
-			val saved = File(root(), "In/$name")
+			val saved = folderFile("In/$name")
 			assertTrue(name, waitFor { saved.length() == bytes.size.toLong() })
 			assertArrayEquals(name, bytes, saved.readBytes())
 		}
@@ -270,20 +271,20 @@ class OpenWithTest {
 
 	@Test
 	fun openWith_largeFile_isCopiedCompletely() {
-		setDestinations("/Big")
+		addFolders("Big")
 		val bytes = Random.nextBytes(6 * 1024 * 1024 + 123)
 		launch(viewIntent(provide("big", source("big.bin", bytes), "big.bin", "application/octet-stream"), "application/octet-stream"))
-		val saved = File(root(), "Big/big.bin")
+		val saved = folderFile("Big/big.bin")
 		assertTrue(waitFor(timeoutMs = 30_000) { saved.length() == bytes.size.toLong() })
 		assertArrayEquals(bytes, saved.readBytes())
 	}
 
 	@Test
 	fun openWith_missingMimeAndExtension_stillSaves() {
-		setDestinations("/In")
+		addFolders("In")
 		// No type in the intent, none from the provider, and no extension in the name
-		launch(viewIntent(provide("readme", source("README", "plain".toByteArray()), "README", null), null))
-		assertTrue(waitFor { savedFiles().isNotEmpty() })
+		val controller = launch(viewIntent(provide("readme", source("README", "plain".toByteArray()), "README", null), null))
+		assertTrue(waitFor { controller.get().isFinishing })
 		val saved = savedFiles().single()
 		assertTrue(saved.name, saved.name.startsWith("README"))
 		assertEquals("plain", saved.readText())
@@ -291,38 +292,39 @@ class OpenWithTest {
 
 	@Test
 	fun openWith_typeFromProvider_whenIntentHasNone() {
-		setDestinations("/In")
+		addFolders("In")
 		launch(viewIntent(provide("noext", source("scan", "pdf".toByteArray()), "scan", "application/pdf"), null))
-		val saved = File(root(), "In/scan.pdf")
+		val saved = folderFile("In/scan.pdf")
 		assertTrue(waitFor { saved.length() > 0 })
 	}
 
 	@Test
 	fun openWith_noDisplayName_usesUriName() {
-		setDestinations("/In")
+		addFolders("In")
 		launch(viewIntent(provide("photo.jpg", source("x.jpg", "j".toByteArray()), null, "image/jpeg"), "image/jpeg"))
-		assertTrue(waitFor { File(root(), "In/photo.jpg").length() > 0 })
+		assertTrue(waitFor { folderFile("In/photo.jpg").length() > 0 })
 	}
 
 	@Test
 	fun openWith_repeatedInvocations_followDuplicateSetting() {
-		setDestinations("/In")
+		addFolders("In")
 		prefs.edit().putString("file_exists", "Postfix").commit()
 		repeat(3) { i ->
 			val uri = provide("r$i", source("same.txt", "v$i".toByteArray()), "same.txt", "text/plain")
 			val controller = launch(viewIntent(uri, "text/plain"))
 			assertTrue(waitFor { controller.get().isFinishing })
 		}
-		assertEquals("v0", File(root(), "In/same.txt").readText())
-		assertEquals("v1", File(root(), "In/same.1.txt").readText())
-		assertEquals("v2", File(root(), "In/same.2.txt").readText())
+		assertEquals("v0", folderFile("In/same.txt").readText())
+		assertEquals("v1", folderFile("In/same.1.txt").readText())
+		assertEquals("v2", folderFile("In/same.2.txt").readText())
 	}
 
 	@Test
 	fun openWith_fileUri_isCopied() {
-		setDestinations("/In")
+		addFolders("In")
 		val file = source("legacy.txt", "legacy".toByteArray())
-		launch(viewIntent(Uri.fromFile(file), "text/plain"))
+		val controller = launch(viewIntent(Uri.fromFile(file), "text/plain"))
+		assertTrue(waitFor { controller.get().isFinishing })
 		val saved = savedFiles().single()
 		assertTrue(saved.name.endsWith("legacy.txt"))
 		assertEquals("legacy", saved.readText())
@@ -333,14 +335,14 @@ class OpenWithTest {
 
 	@Test
 	fun openWith_nullUri_failsWithoutCrashing() {
-		setDestinations("/In")
+		addFolders("In")
 		assertFailedWithUnreadable(launch(viewIntent(null, "application/pdf")))
 		assertTrue(savedFiles().isEmpty())
 	}
 
 	@Test
 	fun openWith_revokedGrant_failsWithoutSaving() {
-		setDestinations("/In")
+		addFolders("In")
 		val uri = provide("denied", source("d.pdf", "x".toByteArray()), "d.pdf", "application/pdf",
 			SecurityException("Permission Denial: reading requires grantUriPermission"))
 		assertFailedWithUnreadable(launch(viewIntent(uri, "application/pdf")))
@@ -349,7 +351,7 @@ class OpenWithTest {
 
 	@Test
 	fun openWith_missingFile_failsWithoutSaving() {
-		setDestinations("/In")
+		addFolders("In")
 		val uri = provide("gone", null, "gone.pdf", "application/pdf", FileNotFoundException("deleted"))
 		assertFailedWithUnreadable(launch(viewIntent(uri, "application/pdf")))
 		assertTrue(savedFiles().isEmpty())
@@ -359,7 +361,7 @@ class OpenWithTest {
 	fun openWith_failingProvider_failsWithoutSaving() {
 		// (An unregistered authority cannot be modelled here: Robolectric returns a placeholder
 		// stream where Android throws FileNotFoundException, which is covered above.)
-		setDestinations("/In")
+		addFolders("In")
 		val uri = provide("broken", null, "b.pdf", "application/pdf", IllegalStateException("provider crashed"))
 		assertFailedWithUnreadable(launch(viewIntent(uri, "application/pdf")))
 		assertTrue(savedFiles().isEmpty())
@@ -367,7 +369,7 @@ class OpenWithTest {
 
 	@Test
 	fun openWith_directory_failsWithoutSaving() {
-		setDestinations("/In")
+		addFolders("In")
 		val dir = File(context.cacheDir, "a-folder").apply { mkdirs() }
 		assertFailedWithUnreadable(launch(viewIntent(Uri.fromFile(dir), "*/*")))
 		assertTrue(savedFiles().isEmpty())
@@ -375,7 +377,7 @@ class OpenWithTest {
 
 	@Test
 	fun openWith_webUrlSentExplicitly_isRejected() {
-		setDestinations("/In")
+		addFolders("In")
 		assertFailedWithUnreadable(launch(viewIntent(Uri.parse("https://example.com/a.pdf"), "application/pdf")))
 		assertTrue(savedFiles().isEmpty())
 	}

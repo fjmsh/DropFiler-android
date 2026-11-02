@@ -3,13 +3,20 @@
 		  xmlns:tools="http://schemas.android.com/tools"
 		  tools:ignore="GoogleAppIndexingWarning">
 
-	<!-- Legacy file system access. The app targets API 28 so these keep their
-		 pre-scoped-storage meaning (see README, "Storage compatibility"). -->
-	<uses-permission android:name="android.permission.READ_EXTERNAL_STORAGE" />
-	<uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
+	<!-- Android 5 - 9 only: the built-in Download destination is written to the public
+		 Download folder there (MediaStore.Downloads does not exist before Android 10).
+		 Never granted or requested on Android 10+, where MediaStore needs no permission and
+		 user folders use Storage Access Framework grants. No MANAGE_EXTERNAL_STORAGE. -->
+	<uses-permission
+		android:name="android.permission.WRITE_EXTERNAL_STORAGE"
+		android:maxSdkVersion="28" />
+	<uses-permission
+		android:name="android.permission.READ_EXTERNAL_STORAGE"
+		android:maxSdkVersion="28" />
+	<!-- Downloading shared links. A normal permission, granted at install. -->
 	<uses-permission android:name="android.permission.INTERNET" />
-	<!-- Save result notifications. The app targets API 28, so on Android 13+ the system
-		 asks for this automatically when the notification channel is created. -->
+	<!-- Save result notifications. Requested once from the main screen on Android 13+;
+		 saving works without it. -->
 	<uses-permission android:name="android.permission.POST_NOTIFICATIONS" />
 
 	<application
@@ -35,11 +42,6 @@
 				android:resource="@xml/shortcuts" />
 		</activity>
 		<activity
-			android:name=".activity.FolderSelectActivity"
-			android:exported="false"
-			android:label="@string/title_activity_folder_select"
-			android:parentActivityName=".activity.FolderListActivity" />
-		<activity
 			android:name=".activity.CreditsActivity"
 			android:exported="false"
 			android:label="@string/title_activity_credits"
@@ -61,8 +63,9 @@
 			</intent-filter>
 			<!-- "Open with DropFiler": saves a copy of the opened file (intent data) to a
 				 destination. It does not view or edit files. content:// is the normal case;
-				 file:// is a best-effort fallback for older apps and uses the existing legacy
-				 storage permission only. No BROWSABLE / http(s): web links are not handled. -->
+				 file:// is a best-effort fallback for older apps (readable on Android 9 and older
+				 with the legacy permission; usually unreadable on newer versions, which is
+				 reported instead of saving). No BROWSABLE / http(s): web links are not handled. -->
 			<intent-filter>
 				<action android:name="android.intent.action.VIEW" />
 				<category android:name="android.intent.category.DEFAULT" />
@@ -80,16 +83,6 @@
 			android:exported="false"
 			android:label="@string/title_activity_settings"
 			android:parentActivityName=".activity.FolderListActivity" />
-
-		<!-- DOWNLOAD_COMPLETE is sent by the DownloadManager provider (a different
-			 package), so this receiver has to be exported to receive it. -->
-		<receiver
-			android:name=".receiver.DownloadBroadcastReceiver"
-			android:exported="true">
-			<intent-filter>
-				<action android:name="android.intent.action.DOWNLOAD_COMPLETE" />
-			</intent-filter>
-		</receiver>
 
 		<!-- Bound by the system chooser only; protected by BIND_CHOOSER_TARGET_SERVICE -->
 		<service android:name=".service.LocationChooserTargetService"

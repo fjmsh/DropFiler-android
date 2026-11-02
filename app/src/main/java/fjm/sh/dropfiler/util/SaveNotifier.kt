@@ -10,14 +10,12 @@ import androidx.core.app.NotificationManagerCompat
 import androidx.core.content.ContextCompat
 import fjm.sh.dropfiler.R
 import fjm.sh.dropfiler.activity.FolderListActivity
-import java.io.File
 
 /**
  * Posts a notification with the result of a save (success or failure).
  *
- * The app targets API 28, so on Android 13+ the system asks the user for the notification
- * permission when the channel is first created while an activity is visible; until it is
- * allowed nothing is shown. Toasts are still shown either way.
+ * On Android 13+ the notification permission is requested from the main screen
+ * (FolderListActivity). Saving never depends on it: without it only the toast is shown.
  */
 object SaveNotifier {
 
@@ -39,15 +37,14 @@ object SaveNotifier {
 
 	/**
 	 * Describes where the files were saved, for the notification text.
-	 * @param location Absolute destination folder, or null when the system file picker was used.
+	 * @param location The destination's display location (e.g. "Internal storage/Download" or
+	 *   a folder name), or null when the system file picker (Save as) was used.
 	 */
-	fun describeLocation(context: Context, location: String?): String = when {
-		location == null -> context.getString(R.string.notification_location_picker)
-		else -> LocationHelper.removeRoot(location).ifBlank { File.separator }
-	}
+	fun describeLocation(context: Context, location: String?): String =
+		location ?: context.getString(R.string.notification_location_picker)
 
 	/**
-	 * @param fileNames Names of the saved files, may be empty when unknown.
+	 * @param fileNames Names actually used for the saved files, may be empty when unknown.
 	 * @param location See [describeLocation]
 	 */
 	fun notifySaved(context: Context, fileNames: List<String>, location: String?) {
@@ -58,6 +55,14 @@ object SaveNotifier {
 			else -> context.resources.getQuantityString(R.plurals.notification_saved_files, fileNames.size, fileNames.size, where)
 		}
 		post(context, context.getString(R.string.notification_saved_title), text, R.drawable.fs_ic_stat_saved)
+	}
+
+	/** Some items of a multi-item share were saved, others were not. */
+	fun notifyPartial(context: Context, saved: Int, total: Int, location: String?, reason: CharSequence?) {
+		val where = describeLocation(context, location)
+		val text = context.resources.getQuantityString(R.plurals.notification_partial_text, total, saved, total, where) +
+			(reason?.let { "\n$it" } ?: "")
+		post(context, context.getString(R.string.notification_partial_title), text, R.drawable.fs_ic_stat_failed)
 	}
 
 	/**

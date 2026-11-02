@@ -29,19 +29,28 @@ Android's share feature, or by choosing **Open with → DropFiler** in a file ma
 
 ## Features
 
-* Select any number of locations to save to
-* Works straight away: the built-in **DropFiler** folder (`/DropFiler`) is always available
-  and cannot be removed. It can be hidden in Settings ("Hide "DropFiler" save location")
-  while you have other destinations; with no other destination it is always used
+* Works straight away: the built-in **Download** destination (`Internal storage/Download`,
+  the standard Downloads folder itself — not a `Download/DropFiler` sub folder) is always
+  available, needs no setup or storage permission on Android 10+, and cannot be removed.
+  It can be hidden in Settings ("Hide "Download" save location") while you have other
+  destinations that work; otherwise it is always offered
+* Add any number of other folders with Android's system folder picker — on internal
+  storage, SD cards, USB drives or storage apps that support it. Each is chosen once and
+  remembered (a persisted Storage Access Framework permission); sharing never asks again
 * Share (single or multiple files, text and links) **and** "Open with" for files
 * Save on a single click (saving is automatic when only one location is configured)
 * Direct Share targets for your saved locations
 * Configure whether or not gallery and music apps are notified of saves
 * Choose from a range of duplicate file handling options
 * A notification with the result of every save (saved / not saved)
-* Create new folders while choosing a destination
+* Create new folders in the system folder picker (where the storage provider supports it)
 * Reorder your destinations (drag the handle, or long-press a row); the share sheet uses the same order
-* If a destination folder was deleted or moved, you are asked to pick another one
+* If a destination folder was deleted, its storage removed or its access revoked, it stays
+  in the list marked "tap to reconnect", and the share sheet offers the other destinations
+* Optional one-time **Save as** ("Choose location when saving"): pick a file location with
+  the system picker for a single save, without adding a destination
+* Links to images, video and audio are downloaded straight into the chosen destination;
+  saving shows its progress and can be cancelled
 * Light and dark themes, with optional dynamic (Material You) colors on Android 12+
 * Automated bug reports for requesting support for file types
 
@@ -56,8 +65,9 @@ apps (e.g. file managers) open with a standard Android `ACTION_VIEW` intent.
 * It uses the same destination sheet, filename handling, duplicate-file setting and result
   notification as sharing a single file.
 * Files are read through the `content://` URI and the temporary read permission granted by
-  the opening app. `file://` URIs are accepted as a best effort only (they are rare on
-  Android 7+ and use the existing legacy storage permission). Web links are not handled.
+  the opening app. `file://` URIs are accepted as a best effort only: they are rare on
+  Android 7+, readable on Android 9 and older with the legacy permission, and usually not
+  readable on Android 10+ (DropFiler then says so). Web links are not handled.
 * If the file cannot be read (no permission granted, the file was deleted, a folder was
   passed, the provider refused access), DropFiler says so and saves nothing.
 
@@ -86,7 +96,7 @@ Miuix XML components used:
 | Screen | Components |
 | --- | --- |
 | All screens | `MiuixAppBar` (large collapsing title), `SpringBackLayout` (Miuix over-scroll), `MiuixRecyclerFillView` / `MiuixFillView`, `fragment.Fragment` / `fragment.PreferenceFragmentCompat` |
-| Destinations, share sheet, folder picker | `MiuixCardView` group cards, `ShadowHelper` press feedback, Miuix text / divider styles |
+| Destinations, share sheet | `MiuixCardView` group cards, `ShadowHelper` press feedback, Miuix text / divider styles |
 | Settings | `MiuixPreferenceCategory`, `MiuixSwitchPreference`, `MiuixDropDownPreference`, `MiuixPreference` |
 | Dialogs | `MiuixAlertDialog` (change log, remove destination confirmation) |
 
@@ -145,7 +155,7 @@ desugaring (required by Miuix XML for `java.util.stream` below API 24).
 | | API level |
 | --- | --- |
 | Minimum (`minSdk`) | 21 (Android 5.0) |
-| Target (`targetSdk`) | **28 (Android 9) — fixed, see below** |
+| Target (`targetSdk`) | **36 (Android 16)** |
 | Compile (`compileSdk`) | 36 |
 
 `minSdk` was raised from 15 to 21 because current AndroidX (appcompat 1.7) requires API 21.
@@ -156,12 +166,9 @@ app keeps supporting Android 5.0 – 9 instead of dropping to Android 10+. Known
 limitation below API 26: a Miuix seek bar cannot have a minimum other than 0 (not used by
 this app).
 
-### Why targetSdk stays at 28
-
-The app deliberately keeps `targetSdkVersion 28`. **Do not raise it.** Raising it to 29+
-opts the app into scoped storage, which breaks saving to arbitrary folders with plain
-`java.io.File` access — the core of how DropFiler works. `compileSdk` is higher only so
-that current libraries compile; it does not change runtime behaviour.
+Up to version 6.x the app had to target API 28 because it wrote to arbitrary folders with
+`java.io.File`. Since 7.0 it uses scoped storage APIs only (see [Storage](#storage)), so it
+targets API 36.
 
 ## Installing alongside Phone Saver
 
@@ -196,34 +203,72 @@ or the Monet accent when dynamic colors are on), except in the dark theme with d
 where it uses one tone lighter of the same accent for contrast. The Credits screen shows
 `@mipmap/ic_launcher`, so it updates with the launcher icon.
 
-## Storage compatibility
+## Storage
 
-The storage architecture is unchanged: destinations are absolute folders below the legacy
-external storage root (`Environment.getExternalStorageDirectory()`), files are written with
-`java.io`, URLs are downloaded with `DownloadManager`, and "location select" uses the Storage
-Access Framework (`ACTION_CREATE_DOCUMENT`) as before. The stored destination list
-(`FOLDER_STORE` JSON file) and all preference keys/values are unchanged.
+DropFiler 7 has two kinds of destination, both written through one save engine
+(`save/SaveCoordinator.kt`) used by Share, Share multiple, Open with, Direct Share, text
+and links:
 
-What targeting API 28 means on newer Android versions:
+| | Built-in **Download** | Folders you add |
+| --- | --- | --- |
+| Where | `Internal storage/Download` (root of the standard Downloads folder) | Any folder chosen with the system picker (`ACTION_OPEN_DOCUMENT_TREE`) |
+| Android 10+ | `MediaStore.Downloads` on the primary volume, `RELATIVE_PATH = Download/`; written as pending, then published. **No permission** | Storage Access Framework: persisted read/write tree grant, `DocumentsContract` |
+| Android 5 – 9 | The public Download folder with `WRITE_EXTERNAL_STORAGE` (declared `maxSdkVersion="28"`, requested from the main screen; staged file renamed into place) | Same as Android 10+ (SAF trees exist since Android 5.0) |
+| Setup | None | Pick once; never asked again while the grant exists |
+| Can be removed | No (can be hidden) | Yes; removing also releases the folder grant |
 
-* **Android 6 – 9:** `READ/WRITE_EXTERNAL_STORAGE` are requested at runtime as before.
-* **Android 10:** apps targeting API 28 run with legacy storage automatically
-  (`requestLegacyExternalStorage` only matters for apps targeting 29).
-* **Android 11+:** scoped storage is only enforced for apps targeting API 30+; an app
-  targeting 28 keeps legacy access through the storage permissions. However the platform
-  still protects some locations regardless of target: `Android/data` and `Android/obb`
-  of other apps are not writable, and some OEM builds restrict the root of removable
-  SD cards. Use the **location select** setting (system file picker) for SD cards.
-* **Android 13+:** `READ_EXTERNAL_STORAGE`/`WRITE_EXTERNAL_STORAGE` still apply to apps
-  targeting API 32 or lower, so the existing permission request keeps working.
-* **Android 14+:** installing an APK with a target below API 23 is blocked; API 28 is not
-  affected. Google Play requires a recent target for *new* app updates; this project
-  intentionally does not meet that requirement (see above).
-* `MANAGE_EXTERNAL_STORAGE` is **not** requested.
+* **Restricted folders.** On Android 11+ the system picker does not allow choosing the root
+  of internal storage, the `Download` folder itself, the root of some SD cards, or
+  `Android/data` / `Android/obb`. Choose (or create, in the picker) a sub folder instead.
+  The built-in Download destination is the intended way to save into the Download root.
+* **Duplicate files** ("Behaviour if file already exists"): *Overwrite*, *Do not save* and
+  *Append number* work for both kinds. Overwrites are staged: the new copy is written
+  completely before the old file is replaced, and a failed save only removes what it
+  created. Without storage permission an app only sees the Download files it created
+  itself, so a file of the same name from another app is never replaced: MediaStore saves
+  the new file as e.g. `a (1).txt` (reported as such), and *Do not save* skips it. Document
+  providers may also adjust names; the name reported in the notification is the real one.
+  The old, never-implemented "Request new name" value is treated as *Append number*.
+* **Links.** Images, video and audio (and anything with *Force saving*) are downloaded with
+  `HttpURLConnection` and streamed directly into the destination; web pages are saved as a
+  text file containing the link, as before. `DownloadManager` is no longer used (it can
+  only write to file paths), so the download runs in the share sheet, which shows progress
+  and can be cancelled; the result notification is posted only after the file is complete.
+* **Save as** uses `ACTION_CREATE_DOCUMENT` for one file at a time (multiple files: one
+  picker per file). That is a single document, not a destination.
+* Nothing is written with file paths on Android 10+, and `MANAGE_EXTERNAL_STORAGE`,
+  `requestLegacyExternalStorage` and hidden APIs are not used.
+
+### Upgrading from DropFiler 6.x
+
+* New files go to **Internal storage/Download** instead of `/DropFiler`. Files saved
+  earlier stay in the `DropFiler` folder and are **not** moved or deleted; DropFiler cannot
+  show that folder any more, use a file manager to move them if you like.
+* Folders you added before were stored as paths. A path cannot be turned into a storage
+  permission, so they are kept (same order and names) and marked **tap to reconnect**:
+  tap one, choose the same folder in the picker, and it works again with the same place
+  in the list (and old Direct Share shortcuts for it keep working). If you choose a
+  different folder, DropFiler says so. A former `/Download` destination is shown as
+  covered by the built-in Download destination; just remove it.
+* The new list is stored in `files/DESTINATIONS.json` (versioned, written atomically);
+  the old `FOLDER_STORE` file is left untouched. All settings keep their keys and values,
+  including "Hide …" (now hiding the Download destination).
+* A one-time card on the main screen explains this after the update.
+
+### Permissions
+
+| Permission | Why |
+| --- | --- |
+| `WRITE_EXTERNAL_STORAGE`, `READ_EXTERNAL_STORAGE` (`maxSdkVersion 28`) | Built-in Download destination on Android 5 – 9 only |
+| `INTERNET` | Downloading shared links (normal permission, never asked) |
+| `POST_NOTIFICATIONS` | Save result notifications; asked once on the main screen on Android 13+. Saving works without it (toasts only) |
 
 ### Direct Share
 
-* Android 6 – 9: `LocationChooserTargetService` (unchanged).
+* Targets are identified by a stable destination id, never a path or list position.
+  Destinations that need reconnecting are not offered. Old `folder:<path>` shortcuts from
+  6.x are retired and, if used anyway, resolve to the migrated destination.
+* Android 6 – 9: `LocationChooserTargetService`.
 * Android 10+: destinations are also published as sharing shortcuts
   (`res/xml/shortcuts.xml`, `DirectShareHelper`), the supported mechanism since
   ChooserTargetService was deprecated (recent Android versions no longer query it).
@@ -232,18 +277,23 @@ What targeting API 28 means on newer Android versions:
 ## Testing
 
 `./gradlew testDebugUnitTest` runs Robolectric tests (JVM, simulated Android framework) on
-API 21, 23, 26, 28, 29, 30, 31, 33, 34, 35 and 36. They cover saving text, images, videos,
-documents and multiple files, the three duplicate-file strategies, automatic saving with
-a single destination, Direct Share (extra and sharing shortcut), unsupported content,
-"Open with" (`ACTION_VIEW` resolution for content/file URIs and common MIME types, copying,
-missing MIME types or names, duplicates, revoked grants, missing files, folders, web links),
-existing settings and destinations being read unchanged, adding/removing destinations,
-the folder picker, light/dark/dynamic themes, the blur fallback and accessibility state of
-Miuix switches.
+the API levels listed in each test class (23 – 36; API 21 – 22 are not covered by Robolectric runs here). Storage is simulated with two test
+providers: `TestDocumentsProvider` (a document provider speaking the DocumentsContract
+protocol, with read-only, no-delete, no-truncate, failing-write and unmounted modes) and
+`FakeMediaStore` (MediaStore Downloads rules: pending items, automatic renaming, other
+apps' files invisible). Link downloads use a local HTTP server. Covered: Share, Share
+multiple, Open with (many MIME types, large files, missing names/types, revoked grants,
+missing files), text and links into Download and into SAF folders, every duplicate policy
+for both kinds of destination including other apps' files and concurrent saves, Save as,
+Direct Share and old shortcuts, adding/rejecting/removing/reordering/reconnecting folders,
+upgrade migration, hide-default and recovery, cancellation, activity recreation, manifest
+and permissions, themes and accessibility.
 
-Robolectric is not a device: it does not exercise real storage permission enforcement,
-the system share sheet, DownloadManager, MediaScanner, the SAF picker UI or OEM (HyperOS)
-behaviour. Those need manual testing on devices. See [MIGRATION.md](MIGRATION.md).
+Robolectric is not a device. It cannot prove real MediaProvider, DocumentsUI / persisted
+grant or OEM behaviour, and these were **not** run on devices or emulators for 7.0. Check
+on real Android 10 – 16 (and 5 – 9) devices: saving to Download, picking folders (internal,
+SD card, a cloud provider), reconnecting after an upgrade, revoking access, and links.
+See [MIGRATION.md](MIGRATION.md).
 
 ## Feature requests and bugs
 

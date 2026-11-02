@@ -22,22 +22,15 @@
 	<!-- Folder list -->
 
 
-	<string name="location_select_label">* Select Location *</string>
 
 	<!-- Folder select -->
-	<string name="title_activity_folder_select">Select Folder</string>
 
 	<!-- Saving messages -->
 	<string name="toast_save_successful">Saved successfully.</string>
-	<string name="toast_save_in_progress">Save in progress…</string>
 	<string name="toast_save_failed">Save failed.</string>
-	<string name="toast_save_file_exists_overwrite">Overwriting file already in this location…</string>
 	<string name="toast_save_file_exists_fail">Cannot save, as file already exists.</string>
 	<string name="toast_save_file_exists_self_abort">Aborting! It appears you are saving this file
 		over itself.</string>
-	<string name="toast_save_file_exists_self_continue">Note! It appears you are saving this file
-		over itself. Continuing as allowed by save behaviour…</string>
-	<string name="downloader_description">Saving %1$s</string>
 
 	<!-- Debug / Error -->
 	<string name="not_supported_content_type">Unsupported Content Type</string>
@@ -93,14 +86,15 @@
 	</array>
 
 	<string name="pref_title_location_select">Enable location select</string>
-	<string name="pref_description_location_select">Enable selection of location during saving using
-		Android\'s built in document UI. This is the recommended strategy for saving to an external
-		SD card.
+	<string name="pref_description_location_select">Offer \"Choose location when saving\" in the
+		share sheet. Saves a single copy wherever you pick with Android\'s file picker, without adding a
+		save destination.
 	</string>
 
 	<string name="pref_title_register_file">Register with media scanner</string>
 	<string name="pref_description_register_file">Notify the media scanner when a file has been
-		downloaded. This will help ensure the file will be picked up by gallery and music applications.
+		saved to Download on Android 9 and older. On Android 10 and newer, files saved to Download are
+		always added to the media library, and folders you added are handled by their storage provider.
 	</string>
 
 	<string name="pref_title_lenient_regex">Use lenient filename validation</string>
@@ -165,18 +159,12 @@
 	<string name="folder_list_root_folder">Storage root</string>
 	<string name="folder_list_delete_description">Remove %1$s</string>
 	<string name="folder_list_delete_title">Remove destination?</string>
-	<string name="folder_list_delete_message">%1$s will no longer appear when sharing. Files already saved there are not deleted.</string>
+	<string name="folder_list_delete_message">%1$s will no longer appear when sharing, and &appname; gives up its access to the folder. Files already saved there are not deleted.</string>
 	<string name="folder_list_delete_confirm">Remove</string>
 	<string name="location_select_title">Choose location when saving</string>
 	<string name="location_select_summary">Pick any folder, including SD cards, with the system file picker</string>
 
 	<!-- Folder select -->
-	<string name="folder_select_up">Parent folder</string>
-	<string name="folder_select_current">Current folder</string>
-	<string name="folder_select_empty">This folder has no subfolders</string>
-	<string name="folder_select_here">Save here</string>
-	<string name="folder_select_read_only">Read only — choose another folder</string>
-	<string name="folder_select_open_description">Open %1$s</string>
 
 	<!-- Saver -->
 	<string name="saver_title">Save to</string>
@@ -248,26 +236,52 @@
 	</plurals>
 
 	<!-- New folder / missing destination -->
-	<string name="folder_select_new_folder">New folder</string>
-	<string name="folder_select_new_folder_title">New folder</string>
-	<string name="folder_select_new_folder_hint">Folder name</string>
-	<string name="folder_select_new_folder_create">Create</string>
-	<string name="folder_select_new_folder_error_empty">Enter a folder name.</string>
-	<string name="folder_select_new_folder_error_invalid">Folder names can\'t contain “/” or be “.” or “..”.</string>
-	<string name="folder_select_new_folder_error_exists">A folder or file with this name already exists.</string>
-	<string name="folder_select_new_folder_error_failed">Couldn\'t create the folder here.</string>
-	<string name="saver_missing_title">Folder not found</string>
-	<string name="saver_missing_body">%1$s was moved or deleted. Choose another folder to save to.</string>
+	<string name="saver_missing_title">Destination not available</string>
+	<string name="saver_missing_body">%1$s isn\'t available right now. Choose another destination, or reconnect it in &appname;.</string>
 	<string name="saver_missing_choose">Other destinations</string>
 	<string name="saver_choose_other_folder">Choose another folder</string>
-	<string name="saver_folder_missing">%1$s · not found</string>
+	<string name="saver_folder_unusable">%1$s · reconnect in &appname;</string>
 
 	<!-- Reordering destinations -->
 	<string name="folder_list_move_up">Move up</string>
 	<string name="folder_list_move_down">Move down</string>
 	<string name="folder_list_moved_announcement">%1$s moved to position %2$d of %3$d</string>
 	<string name="folder_list_default_summary">%1$s · Default location</string>
-	<string name="toast_default_folder_hidden">&appname; is already a built-in save location. Turn off \"Hide \"&appname;\" save location\" in Settings to show it.</string>
-	<string name="pref_title_hide_default_folder">Hide \"&appname;\" save location</string>
-	<string name="pref_description_hide_default_folder">Hide the built-in &appname; folder when you have added other save locations. If there are no others, it is still shown.</string>
+	<string name="pref_title_hide_default_folder">Hide \"Download\" save location</string>
+	<string name="pref_description_hide_default_folder">Hide the built-in Download location while you have other save locations that are available. If none of them is available, Download is still shown.</string>
+	<!-- Storage: built-in Download destination (MediaStore) and SAF folders -->
+	<string name="default_destination_label">Download</string>
+	<string name="default_destination_path">Internal storage/Download</string>
+	<string name="destination_unnamed_folder">Folder</string>
+	<string name="destination_saf_summary">Folder chosen with the system picker</string>
+	<string name="destination_state_needs_permission">Access was removed · tap to reconnect</string>
+	<string name="destination_state_unavailable">Not available (deleted or storage removed) · tap to choose again</string>
+	<string name="destination_state_read_only">Read-only · tap to choose another folder</string>
+	<string name="destination_state_reconnect">Was %1$s · tap to choose it again</string>
+	<string name="destination_state_duplicates_default">Same as the built-in Download location · you can remove this</string>
+	<string name="destination_reconnect_description">Reconnect %1$s</string>
+	<string name="toast_no_folder_picker">No app is available to choose a folder.</string>
+	<string name="toast_destination_duplicate">%1$s is already a save destination.</string>
+	<string name="toast_destination_not_granted">&appname; was not given lasting access to this folder. Choose another folder.</string>
+	<string name="toast_destination_read_only">This folder does not allow new files. Choose another folder.</string>
+	<string name="toast_destination_unavailable">This folder can\'t be used. Choose another folder.</string>
+	<string name="toast_destination_reconnected">%1$s reconnected.</string>
+	<string name="toast_destination_changed">Now saving to %1$s instead of %2$s.</string>
+	<string name="saver_missing_removed">This destination</string>
+	<string name="saver_saving_title">Saving…</string>
+	<string name="saver_saving_body">Large files and links can take a moment. Cancel stops saving.</string>
+	<string name="toast_save_cancelled">Save cancelled.</string>
+	<string name="toast_save_source_unreadable">The shared file could not be read.</string>
+	<string name="toast_save_destination_unavailable">The save location is not available.</string>
+	<string name="toast_save_no_permission">&appname; has no access to this save location.</string>
+	<string name="toast_save_no_space">Not enough storage space.</string>
+	<string name="toast_save_too_many">Too many files with this name already exist.</string>
+	<string name="toast_save_network">The link could not be downloaded.</string>
+	<string name="notification_partial_title">Some items not saved</string>
+	<plurals name="notification_partial_text">
+		<item quantity="one">%1$d of %2$d item saved to %3$s</item>
+		<item quantity="other">%1$d of %2$d items saved to %3$s</item>
+	</plurals>
+	<string name="upgrade_notice_title">New files now go to Download</string>
+	<string name="upgrade_notice_body">&appname; now saves to %1$s by default. Files saved earlier stay in the DropFiler folder and are not moved. Folders you added before must be chosen again once: tap them below to reconnect.</string>
 </resources>

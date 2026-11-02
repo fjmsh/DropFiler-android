@@ -14,11 +14,11 @@ android {
 		// API 21 is the minimum supported by current AndroidX (appcompat 1.7) and by
 		// Miuix XML after the API audit documented in README.md (previously 15).
 		minSdk 21
-		// NON-NEGOTIABLE: the app must keep targeting API 28 so that the legacy
-		// file system storage model keeps working. Do not raise this value.
-		targetSdk 28
-		versionCode 37
-		versionName "6.0.0"
+		// Scoped storage: the built-in Download destination uses MediaStore.Downloads and
+		// user folders use Storage Access Framework tree grants (see README, "Storage").
+		targetSdk 36
+		versionCode 38
+		versionName "7.0.0"
 
 		vectorDrawables.useSupportLibrary = true
 		testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
@@ -58,8 +58,6 @@ android {
 	}
 	lint {
 		disable 'MissingTranslation'
-		// targetSdk 28 is a deliberate, documented requirement (legacy storage access).
-		disable 'ExpiredTargetSdkVersion', 'OldTargetApi'
 		// Gradle dependency versions are pinned deliberately (see README).
 		disable 'GradleDependency', 'NewerVersionAvailable', 'AndroidGradlePluginVersion'
 		textReport true

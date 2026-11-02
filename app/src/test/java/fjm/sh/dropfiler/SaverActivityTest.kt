@@ -9,8 +9,8 @@ import androidx.recyclerview.widget.RecyclerView
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import fjm.sh.dropfiler.TestSupport.context
 import fjm.sh.dropfiler.TestSupport.prefs
-import fjm.sh.dropfiler.TestSupport.root
-import fjm.sh.dropfiler.TestSupport.setDestinations
+import fjm.sh.dropfiler.TestSupport.addFolders
+import fjm.sh.dropfiler.TestSupport.folderFile
 import fjm.sh.dropfiler.TestSupport.waitFor
 import fjm.sh.dropfiler.activity.SaverActivity
 import org.junit.Assert.assertEquals
@@ -34,11 +34,10 @@ class SaverActivityTest {
 
 	@Before
 	fun setUp() {
-		root().listFiles()?.forEach { it.deleteRecursively() }
-		prefs.edit().clear().commit()
-		// These tests are about the user's own destinations: hide the built-in DropFiler
-		// folder, which is then only used when there is no other destination (DefaultFolderTest)
-		prefs.edit().putBoolean(fjm.sh.dropfiler.util.LocationHelper.PREF_HIDE_DEFAULT_FOLDER, true).commit()
+		TestSupport.reset()
+		// These tests are about the user's own (SAF) destinations: hide the built-in Download
+		// destination, which is then only used when no other destination works (DefaultFolderTest)
+		TestSupport.hideDefault()
 		// Robolectric's MimeTypeMap may be empty; register what the tests use
 		shadowOf(MimeTypeMap.getSingleton()).apply {
 			addExtensionMimeTypeMapping("txt", "text/plain")
@@ -69,10 +68,10 @@ class SaverActivityTest {
 
 	@Test
 	fun singleDestination_savesTextAutomatically() {
-		setDestinations("/Saved")
+		addFolders("Saved")
 		val controller = launch(textIntent("hello world"))
 
-		val saved = File(root(), "Saved/helloworld.txt")
+		val saved = folderFile("Saved/helloworld.txt")
 		assertTrue("text should be saved without asking", waitFor { saved.exists() && saved.length() > 0 })
 		assertEquals("hello world", saved.readText())
 		assertTrue(waitFor { controller.get().isFinishing })
@@ -87,31 +86,31 @@ class SaverActivityTest {
 
 	@Test
 	fun successfulSave_postsResultNotification() {
-		setDestinations("/Saved")
+		addFolders("Saved")
 		launch(textIntent("hello world"))
 		assertTrue(waitFor { notifications().isNotEmpty() })
 
 		val notification = notifications().single()
 		assertEquals(context.getString(R.string.notification_saved_title), notification.title())
-		assertEquals("helloworld.txt saved to /Saved", notification.text())
+		assertEquals("helloworld.txt saved to Saved", notification.text())
 	}
 
 	@Test
 	fun failedSave_postsResultNotificationWithReason() {
-		setDestinations("/Saved")
-		File(root(), "Saved/helloworld.txt").writeText("old")
+		addFolders("Saved")
+		folderFile("Saved/helloworld.txt").writeText("old")
 		prefs.edit().putString("file_exists", "Nothing").commit()
 		launch(textIntent("hello world"))
 		assertTrue(waitFor { notifications().isNotEmpty() })
 
 		val notification = notifications().single()
 		assertEquals(context.getString(R.string.notification_failed_title), notification.title())
-		assertEquals(context.getString(R.string.toast_save_file_exists_fail), notification.text())
+		assertEquals("helloworld.txt: " + context.getString(R.string.toast_save_file_exists_fail), notification.text())
 	}
 
 	@Test
 	fun multipleFiles_postOneNotification() {
-		setDestinations("/Batch")
+		addFolders("Batch")
 		val intent = Intent(context, SaverActivity::class.java)
 			.setAction(Intent.ACTION_SEND_MULTIPLE)
 			.setType("image/*")
@@ -119,14 +118,7 @@ class SaverActivityTest {
 				sourceFile("a.jpg", "1"), sourceFile("b.jpg", "2")))
 		launch(intent)
 		assertTrue(waitFor { notifications().isNotEmpty() })
-		assertEquals("2 items saved to /Batch", notifications().single().text())
-	}
-
-	@Test
-	fun completedDownload_postsResultNotification() {
-		fjm.sh.dropfiler.receiver.DownloadBroadcastReceiver()
-			.onReceive(context, Intent(android.app.DownloadManager.ACTION_DOWNLOAD_COMPLETE))
-		assertEquals(context.getString(R.string.notification_saved_title), notifications().single().title())
+		assertEquals("2 items saved to Batch", notifications().single().text())
 	}
 
 	private fun rows(activity: SaverActivity) =
@@ -150,7 +142,7 @@ class SaverActivityTest {
 
 	@Test
 	fun shareSheet_followsTheOrderSetOnTheMainScreen() {
-		setDestinations("/Zeta", "/Alpha", "/Mid")
+		addFolders("Zeta", "Alpha", "Mid")
 		val activity = launch(textIntent("order")).get()
 		assertTrue(waitFor { activity.findViewById<View>(R.id.list).visibility == View.VISIBLE })
 		assertEquals(listOf("Zeta", "Alpha", "Mid"), rows(activity).map { it.title.toString() })
@@ -158,7 +150,7 @@ class SaverActivityTest {
 
 	@Test
 	fun shareSheet_hasDividersBetweenDestinations() {
-		setDestinations("/A", "/B", "/C")
+		addFolders("A", "B", "C")
 		val activity = launch(textIntent("dividers")).get()
 		assertTrue(waitFor { activity.findViewById<View>(R.id.list).visibility == View.VISIBLE })
 		val list = activity.findViewById<RecyclerView>(R.id.list)
@@ -173,8 +165,9 @@ class SaverActivityTest {
 
 	@Test
 	fun missingSingleDestination_asksForAnotherFolderInsteadOfCrashing() {
-		setDestinations("/Gone")
-		File(root(), "Gone").deleteRecursively()
+		addFolders("Gone")
+		folderFile("Gone").deleteRecursively()
+		// The built-in Download destination is offered again, as nothing else works
 		val activity = launch(streamIntent("image/jpeg", sourceFile("photo.jpg", "x"))).get()
 
 		assertTrue(waitFor { activity.findViewById<View>(R.id.list).visibility == View.VISIBLE })
@@ -184,40 +177,41 @@ class SaverActivityTest {
 		assertTrue(rows[0].danger)
 		// The missing destination is shown but cannot be chosen
 		assertFalse(rows.first { it.title == "Gone" }.enabled)
+		assertTrue(rows.first { it.title == context.getString(R.string.default_destination_label) }.enabled)
 		// The system picker is always offered
 		assertTrue(rows.any { it.title == context.getString(R.string.saver_choose_other_folder) })
-		assertFalse(File(root(), "Gone").exists())
+		assertFalse(folderFile("Gone").exists())
 	}
 
 	@Test
 	fun missingDestination_anotherFolderCanBeChosen() {
-		setDestinations("/Gone", "/Ok")
-		File(root(), "Gone").deleteRecursively()
+		addFolders("Gone", "Ok")
+		folderFile("Gone").deleteRecursively()
 		val activity = launch(textIntent("other folder")).get()
 
 		assertTrue(waitFor { activity.findViewById<View>(R.id.list).visibility == View.VISIBLE })
 		assertFalse(rows(activity).first { it.title == "Gone" }.clickable)
 		clickRow(activity, "Ok")
-		assertTrue(waitFor { File(root(), "Ok/otherfolder.txt").length() > 0 })
+		assertTrue(waitFor { folderFile("Ok/otherfolder.txt").length() > 0 })
 	}
 
 	@Test
 	fun missingDirectShareFolder_asksForAnotherFolder() {
-		setDestinations("/Gone", "/Ok")
-		File(root(), "Gone").deleteRecursively()
-		val activity = launch(textIntent("direct").putExtra(SaverActivity.DIRECT_SHARE_FOLDER, "/Gone")).get()
+		val (gone, _) = addFolders("Gone", "Ok")
+		folderFile("Gone").deleteRecursively()
+		val activity = launch(textIntent("direct").putExtra(SaverActivity.DIRECT_SHARE_DESTINATION, gone.id)).get()
 
 		assertTrue(waitFor { activity.findViewById<View>(R.id.list).visibility == View.VISIBLE })
 		assertEquals(context.getString(R.string.saver_missing_title), rows(activity)[0].title)
 		clickRow(activity, "Ok")
-		assertTrue(waitFor { File(root(), "Ok/direct.txt").length() > 0 })
+		assertTrue(waitFor { folderFile("Ok/direct.txt").length() > 0 })
 	}
 
 	@Test
 	@Suppress("DEPRECATION")
 	fun missingDestination_systemPickerCanBeChosen() {
-		setDestinations("/Gone")
-		File(root(), "Gone").deleteRecursively()
+		addFolders("Gone")
+		folderFile("Gone").deleteRecursively()
 		val activity = launch(textIntent("picked")).get()
 		assertTrue(waitFor { activity.findViewById<View>(R.id.list).visibility == View.VISIBLE })
 
@@ -228,7 +222,7 @@ class SaverActivityTest {
 
 	@Test
 	fun multipleDestinations_showsSelector_andSavesToChosenFolder() {
-		setDestinations("/A", "/B")
+		addFolders("A", "B")
 		val activity = launch(textIntent("pick me")).get()
 
 		val list = activity.findViewById<RecyclerView>(R.id.list)
@@ -240,35 +234,35 @@ class SaverActivityTest {
 		list.layout(0, 0, 1080, list.measuredHeight)
 		list.findViewHolderForAdapterPosition(1)!!.itemView.findViewById<View>(R.id.row).performClick()
 
-		val saved = File(root(), "B/pickme.txt")
+		val saved = folderFile("B/pickme.txt")
 		assertTrue(waitFor { saved.exists() && saved.length() > 0 })
 		assertEquals("pick me", saved.readText())
-		assertFalse(File(root(), "A/pickme.txt").exists())
+		assertFalse(folderFile("A/pickme.txt").exists())
 	}
 
 	@Test
 	fun sharedImageStream_isCopied() {
-		setDestinations("/Pictures")
+		addFolders("Pictures")
 		launch(streamIntent("image/jpeg", sourceFile("photo.jpg", "jpeg-bytes")))
 
-		val saved = File(root(), "Pictures/photo.jpg")
+		val saved = folderFile("Pictures/photo.jpg")
 		assertTrue(waitFor { saved.exists() && saved.length() > 0 })
 		assertEquals("jpeg-bytes", saved.readText())
 	}
 
 	@Test
 	fun sharedVideoAndDocumentStreams_areCopied() {
-		setDestinations("/Media")
+		addFolders("Media")
 		launch(streamIntent("video/mp4", sourceFile("clip.mp4", "video")))
-		assertTrue(waitFor { File(root(), "Media/clip.mp4").length() > 0 })
+		assertTrue(waitFor { folderFile("Media/clip.mp4").length() > 0 })
 
 		launch(streamIntent("application/pdf", sourceFile("report.pdf", "pdf")))
-		assertTrue(waitFor { File(root(), "Media/report.pdf").length() > 0 })
+		assertTrue(waitFor { folderFile("Media/report.pdf").length() > 0 })
 	}
 
 	@Test
 	fun sendMultiple_savesEveryStream() {
-		setDestinations("/Batch")
+		addFolders("Batch")
 		val intent = Intent(context, SaverActivity::class.java)
 			.setAction(Intent.ACTION_SEND_MULTIPLE)
 			.setType("image/*")
@@ -276,41 +270,42 @@ class SaverActivityTest {
 				sourceFile("one.jpg", "1"), sourceFile("two.jpg", "2")))
 		launch(intent)
 
-		assertTrue(waitFor { File(root(), "Batch/one.jpg").length() > 0 && File(root(), "Batch/two.jpg").length() > 0 })
-		assertEquals("1", File(root(), "Batch/one.jpg").readText())
-		assertEquals("2", File(root(), "Batch/two.jpg").readText())
+		assertTrue(waitFor { folderFile("Batch/one.jpg").length() > 0 && folderFile("Batch/two.jpg").length() > 0 })
+		assertEquals("1", folderFile("Batch/one.jpg").readText())
+		assertEquals("2", folderFile("Batch/two.jpg").readText())
 	}
 
 	@Test
 	fun existingFile_overwriteStrategy_replacesFile() {
-		setDestinations("/Saved")
-		val existing = File(root(), "Saved/helloworld.txt").apply { writeText("old") }
+		addFolders("Saved")
+		val existing = folderFile("Saved/helloworld.txt").apply { writeText("old") }
 		prefs.edit().putString("file_exists", "Overwrite").commit()
 
 		launch(textIntent("hello world"))
-		assertTrue(waitFor { existing.readText() == "hello world" })
+		assertTrue(waitFor { runCatching { existing.readText() }.getOrNull() == "hello world" })
 	}
 
 	@Test
 	fun existingFile_doNotSaveStrategy_keepsFile() {
-		setDestinations("/Saved")
-		val existing = File(root(), "Saved/helloworld.txt").apply { writeText("old") }
+		addFolders("Saved")
+		val existing = folderFile("Saved/helloworld.txt").apply { writeText("old") }
 		prefs.edit().putString("file_exists", "Nothing").commit()
 
 		val controller = launch(textIntent("hello world"))
 		assertTrue(waitFor { controller.get().isFinishing })
 		assertEquals("old", existing.readText())
-		assertEquals(1, File(root(), "Saved").listFiles()!!.size)
+		assertEquals(1, folderFile("Saved").listFiles()!!.size)
+		assertEquals(context.getString(R.string.toast_save_file_exists_fail), org.robolectric.shadows.ShadowToast.getTextOfLatestToast())
 	}
 
 	@Test
 	fun existingFile_postfixStrategy_appendsNumber() {
-		setDestinations("/Saved")
-		val existing = File(root(), "Saved/helloworld.txt").apply { writeText("old") }
+		addFolders("Saved")
+		val existing = folderFile("Saved/helloworld.txt").apply { writeText("old") }
 		prefs.edit().putString("file_exists", "Postfix").commit()
 
 		launch(textIntent("hello world"))
-		val numbered = File(root(), "Saved/helloworld.1.txt")
+		val numbered = folderFile("Saved/helloworld.1.txt")
 		assertTrue(waitFor { numbered.exists() && numbered.length() > 0 })
 		assertEquals("hello world", numbered.readText())
 		assertEquals("old", existing.readText())
@@ -318,27 +313,27 @@ class SaverActivityTest {
 
 	@Test
 	fun directShareExtra_savesToTargetWithoutSelector() {
-		setDestinations("/A", "/B")
-		val intent = textIntent("direct").putExtra(SaverActivity.DIRECT_SHARE_FOLDER, "/B")
+		val (_, b) = addFolders("A", "B")
+		val intent = textIntent("direct").putExtra(SaverActivity.DIRECT_SHARE_DESTINATION, b.id)
 		launch(intent)
 
-		assertTrue(waitFor { File(root(), "B/direct.txt").length() > 0 })
-		assertFalse(File(root(), "A/direct.txt").exists())
+		assertTrue(waitFor { folderFile("B/direct.txt").length() > 0 })
+		assertFalse(folderFile("A/direct.txt").exists())
 	}
 
 	@Test
 	fun sharingShortcut_savesToTargetWithoutSelector() {
-		setDestinations("/A", "/B")
-		val intent = textIntent("shortcut").putExtra(ShortcutManagerCompat.EXTRA_SHORTCUT_ID, "folder:/A")
+		val (a, _) = addFolders("A", "B")
+		val intent = textIntent("shortcut").putExtra(ShortcutManagerCompat.EXTRA_SHORTCUT_ID, "dest:" + a.id)
 		launch(intent)
 
-		assertTrue(waitFor { File(root(), "A/shortcut.txt").length() > 0 })
-		assertFalse(File(root(), "B/shortcut.txt").exists())
+		assertTrue(waitFor { folderFile("A/shortcut.txt").length() > 0 })
+		assertFalse(folderFile("B/shortcut.txt").exists())
 	}
 
 	@Test
 	fun unsupportedContent_showsSupportInformation() {
-		setDestinations("/A", "/B")
+		addFolders("A", "B")
 		val intent = Intent(context, SaverActivity::class.java)
 			.setAction(Intent.ACTION_SEND)
 			.setType("application/x-unknown")
@@ -349,10 +344,9 @@ class SaverActivityTest {
 	}
 
 	@Test
-	fun noDestinations_savesToDropFilerFolder() {
-		LocationHelperAccess.writeEmptyList()
+	fun noDestinations_savesToDownload() {
 		val controller = launch(textIntent("nowhere"))
-		val saved = File(root(), "DropFiler/nowhere.txt")
+		val saved = TestSupport.downloads().resolve("nowhere.txt")
 		assertTrue(waitFor { saved.length() > 0 })
 		assertEquals("nowhere", saved.readText())
 		assertTrue(waitFor { controller.get().isFinishing })
@@ -360,17 +354,13 @@ class SaverActivityTest {
 
 	@Test
 	fun cancel_closesSheetWithoutSaving() {
-		setDestinations("/A", "/B")
+		addFolders("A", "B")
 		val activity = launch(textIntent("cancel me")).get()
 		assertTrue(waitFor { activity.findViewById<View>(R.id.list).visibility == View.VISIBLE })
 
 		activity.findViewById<View>(R.id.cancel).performClick()
 		assertTrue(activity.isFinishing)
-		assertFalse(File(root(), "A/cancelme.txt").exists())
-		assertFalse(File(root(), "B/cancelme.txt").exists())
-	}
-
-	private object LocationHelperAccess {
-		fun writeEmptyList() = fjm.sh.dropfiler.util.LocationHelper.saveFolderList(context, mutableListOf())
+		assertFalse(folderFile("A/cancelme.txt").exists())
+		assertFalse(folderFile("B/cancelme.txt").exists())
 	}
 }

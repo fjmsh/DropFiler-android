@@ -12,7 +12,7 @@ import com.hchen.himiuix.preference.MiuixSwitchPreference
 import fjm.sh.dropfiler.R
 import fjm.sh.dropfiler.util.ChangeLogHelper
 import fjm.sh.dropfiler.util.DirectShareHelper
-import fjm.sh.dropfiler.util.LocationHelper
+import fjm.sh.dropfiler.destination.DestinationRepository
 import fjm.sh.dropfiler.util.SettingsDataStore
 import fjm.sh.dropfiler.util.ThemeHelper
 
@@ -93,9 +93,7 @@ class SettingsActivity: BaseActivity() {
 				// Other activities recreate themselves on resume (BaseActivity)
 				ThemeHelper.PREF_DYNAMIC_COLORS -> activity?.recreate()
 				// Keep Direct Share targets in line with the destinations shown when sharing
-				LocationHelper.PREF_HIDE_DEFAULT_FOLDER -> context?.let {
-					DirectShareHelper.publish(it, LocationHelper.destinations(it))
-				}
+				DestinationRepository.PREF_HIDE_DEFAULT_FOLDER -> context?.let { DirectShareHelper.publish(it) }
 			}
 		}
 

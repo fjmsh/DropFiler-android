@@ -15,13 +15,10 @@
 
 
 	<!-- Folder select -->
-	<string name="title_activity_folder_select">フォルダーの選択</string>
 
 	<!-- Saving messages -->
 	<string name="toast_save_successful">正常に保存しました</string>
-	<string name="toast_save_in_progress">保存しています</string>
 	<string name="toast_save_failed">保存に失敗しました</string>
-	<string name="downloader_description">%1$s を保存中</string>
 
 	<!-- Debug / Error -->
 	<string name="not_supported_content_type">サポートしていないコンテンツタイプ</string>
@@ -52,16 +49,9 @@
 	<string name="folder_list_root_folder">ストレージのルート</string>
 	<string name="folder_list_delete_description">%1$s を削除</string>
 	<string name="folder_list_delete_title">保存先を削除しますか？</string>
-	<string name="folder_list_delete_message">%1$s は共有時に表示されなくなります。保存済みのファイルは削除されません。</string>
 	<string name="folder_list_delete_confirm">削除</string>
 	<string name="location_select_title">保存時に場所を選択</string>
 	<string name="location_select_summary">システムのファイル選択で SD カードを含む任意のフォルダを選べます</string>
-	<string name="folder_select_up">親フォルダ</string>
-	<string name="folder_select_current">現在のフォルダ</string>
-	<string name="folder_select_empty">このフォルダにはサブフォルダがありません</string>
-	<string name="folder_select_here">ここに保存</string>
-	<string name="folder_select_read_only">読み取り専用 — 別のフォルダを選択してください</string>
-	<string name="folder_select_open_description">%1$s を開く</string>
 	<string name="saver_title">保存先</string>
 	<string name="saver_subtitle_text">テキスト</string>
 	<string name="saver_subtitle_link">リンク</string>
@@ -116,26 +106,23 @@
 	</plurals>
 
 	<!-- New folder / missing destination -->
-	<string name="folder_select_new_folder">新しいフォルダ</string>
-	<string name="folder_select_new_folder_title">新しいフォルダ</string>
-	<string name="folder_select_new_folder_hint">フォルダ名</string>
-	<string name="folder_select_new_folder_create">作成</string>
-	<string name="folder_select_new_folder_error_empty">フォルダ名を入力してください。</string>
-	<string name="folder_select_new_folder_error_invalid">フォルダ名に「/」は使えません。「.」「..」も使えません。</string>
-	<string name="folder_select_new_folder_error_exists">同じ名前のフォルダまたはファイルが既にあります。</string>
-	<string name="folder_select_new_folder_error_failed">ここにフォルダを作成できませんでした。</string>
-	<string name="saver_missing_title">フォルダが見つかりません</string>
-	<string name="saver_missing_body">%1$s は移動または削除されました。保存先として別のフォルダを選択してください。</string>
 	<string name="saver_missing_choose">その他の保存先</string>
 	<string name="saver_choose_other_folder">別のフォルダを選択</string>
-	<string name="saver_folder_missing">%1$s · 見つかりません</string>
 
 	<!-- Reordering destinations -->
 	<string name="folder_list_move_up">上へ移動</string>
 	<string name="folder_list_move_down">下へ移動</string>
 	<string name="folder_list_moved_announcement">%1$s を %3$d 件中 %2$d 番目に移動しました</string>
 	<string name="folder_list_default_summary">%1$s · デフォルトの保存場所</string>
-	<string name="toast_default_folder_hidden">&appname; は組み込みの保存場所です。表示するには、設定で「「&appname;」保存場所を非表示」をオフにしてください。</string>
-	<string name="pref_title_hide_default_folder">「&appname;」保存場所を非表示</string>
-	<string name="pref_description_hide_default_folder">ほかの保存場所を追加しているときは、組み込みの &appname; フォルダーを非表示にします。ほかに保存場所がない場合は表示されます。</string>
+	<!-- Storage (Download destination and system folder picker) -->
+	<string name="pref_title_hide_default_folder">「Download」保存場所を非表示</string>
+	<string name="pref_description_hide_default_folder">利用可能な他の保存場所がある間は、組み込みの Download を非表示にします。利用可能な保存場所がない場合は表示されます。</string>
+	<string name="saver_missing_title">保存場所を利用できません</string>
+	<string name="saver_missing_body">%1$s は現在利用できません。別の保存場所を選ぶか、&appname; で再接続してください。</string>
+	<string name="saver_folder_unusable">%1$s · &appname; で再接続してください</string>
+	<string name="folder_list_delete_message">%1$s は共有時に表示されなくなり、&appname; はこのフォルダへのアクセスを解除します。保存済みのファイルは削除されません。</string>
+	<string name="default_destination_label">Download</string>
+	<string name="default_destination_path">内部ストレージ/Download</string>
+	<string name="upgrade_notice_title">新しいファイルは Download に保存されます</string>
+	<string name="upgrade_notice_body">&appname; は既定で %1$s に保存するようになりました。以前に保存したファイルは DropFiler フォルダに残り、移動されません。以前に追加したフォルダは一度選び直す必要があります。下のフォルダをタップして再接続してください。</string>
 </resources>

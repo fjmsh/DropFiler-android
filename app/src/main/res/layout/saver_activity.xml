@@ -62,7 +62,7 @@
 			android:layout_height="wrap_content"
 			android:layout_marginTop="@dimen/miuix_basic_margin">
 
-			<!-- Testing support (dry run) -->
+			<!-- Testing support, then saving progress -->
 			<LinearLayout
 				android:id="@+id/loading"
 				android:layout_width="match_parent"
@@ -89,6 +89,7 @@
 					android:orientation="vertical">
 
 					<TextView
+						android:id="@+id/loading_title"
 						style="@style/MiuixTitleStyle"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"
@@ -97,6 +98,7 @@
 						android:text="@string/loading_title" />
 
 					<TextView
+						android:id="@+id/loading_body"
 						style="@style/MiuixSummaryStyle"
 						android:layout_width="match_parent"
 						android:layout_height="wrap_content"

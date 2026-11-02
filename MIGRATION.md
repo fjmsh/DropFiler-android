@@ -8,6 +8,10 @@ verified, and the known limitations.
 > `fjm.sh.dropfiler`, and "Open with" support was added. See
 > [DropFiler rename and "Open with"](#dropfiler-rename-and-open-with) at the end. The 6.0
 > sections below are kept as a historical record (the `fjmd3v` account is now `fjmsh`).
+>
+> **7.0 replaced the storage model** (targetSdk 28 → 36, MediaStore Downloads + Storage
+> Access Framework). The "targetSdk 28" non-negotiable below no longer applies. See
+> [7.0: MediaStore + SAF storage](#70-mediastore--saf-storage) at the end.
 
 ## Non-negotiables (kept)
 
@@ -326,3 +330,74 @@ The Links setting "Save Imgur images" (`special_imgur`, off by default) and the 
 controlled (`ImgurHelper`: saving the first image of a shared Imgur page) were removed.
 Imgur links are now saved like any other link. A stored `special_imgur` value is ignored
 and left untouched, like the earlier `hide_support`.
+
+## 7.0: MediaStore + SAF storage
+
+### What changed
+
+| | 6.x | 7.0 |
+| --- | --- | --- |
+| `targetSdk` | 28 (legacy storage) | **36** |
+| `minSdk` | 21 | 21 (unchanged) |
+| Built-in destination | `/DropFiler` (`java.io`, created on demand) | `Internal storage/Download` — `MediaStore.Downloads`, `RELATIVE_PATH=Download/`, pending → published (API 29+); public Download folder with `WRITE_EXTERNAL_STORAGE maxSdkVersion=28` (API 21 – 28) |
+| User destinations | Paths chosen in the app's own folder browser (`FolderSelectActivity`) | `ACTION_OPEN_DOCUMENT_TREE` + persisted grant, written with `DocumentsContract` |
+| Destination store | `FOLDER_STORE`: JSON list of paths | `DESTINATIONS.json`: version 2, records with stable id, kind, label, tree URI, legacy path; `AtomicFile` |
+| Destination identity (sheet, Direct Share, shortcuts) | Path string / list position | Stable id (`system:downloads`, `saf:<uuid>`, `legacy:<uuid-from-path>`); shortcut ids `dest:<id>` |
+| Links | `DownloadManager.setDestinationInExternalPublicDir` + `DOWNLOAD_COMPLETE` receiver | `HttpURLConnection` streamed into the chosen destination; receiver removed |
+| Saving code | `SaverActivity`, `HandleSingleTextTask`, `SaveFromUrlTask`, `LocationSelectTask` (separate write paths) | `save/` package: `IncomingContentParser`, `Filenames`, `SaveCoordinator`, writers `MediaStoreDownloadsWriter`, `LegacyDownloadsWriter`, `SafTreeWriter`, `SingleDocumentWriter`, `UrlDownloader` |
+| Permissions | `READ/WRITE_EXTERNAL_STORAGE` (all versions), runtime request incl. `INTERNET` | Storage only `maxSdkVersion=28`; `INTERNET` normal; `POST_NOTIFICATIONS` requested once on Android 13+ |
+
+Kept: application ID, namespace, branding, icons, Miuix XML Views UI (cards, sheet, drag
+reordering and accessibility actions), all preference keys and stored values, the
+hide-default setting (now for Download), duplicate policies, Save as, Share/Open with
+intent filters, notifications and Direct Share on both mechanisms.
+
+Removed: `FolderSelectActivity` and its layouts/strings (the system picker replaces it and
+offers "New folder"), `LocationHelper`, `JsonFileHelper`, `LinkHelper`, the `saver/` tasks
+and `DownloadBroadcastReceiver`.
+
+### Data migration
+
+* Runs on the first load of the destination list. Each `FOLDER_STORE` path (except the
+  implicit `/DropFiler`, and duplicates) becomes a `LEGACY_RECONNECT_REQUIRED` record with
+  its order and label and an id derived from the path, so an interrupted migration repeats
+  identically. The new file is written atomically; `FOLDER_STORE` is never changed.
+* No grant is invented. Legacy records are listed with "tap to reconnect"; reconnecting
+  keeps the id and position and the legacy path (old `folder:<path>` shortcuts resolve to
+  it). Picking a different folder is reported explicitly. `/Download` records are marked
+  as covered by the built-in destination.
+* Files in `/DropFiler` are not moved, copied or deleted. A one-time card explains this.
+* A corrupt version 2 file is kept as `DESTINATIONS.json.corrupt-<time>` and the migration
+  runs again from `FOLDER_STORE`.
+
+### Platform behaviour relied on (and its limits)
+
+* MediaStore lets an app insert Download items without permission (API 29+) and see only
+  its own items; it renames on conflicts. So overwrite only ever replaces DropFiler's own
+  earlier files; other apps' files are never replaced, and "Do not save" is honoured by
+  deleting the renamed new item. Global filename uniqueness is not claimed.
+* Overwrite is staged on all targets (new copy complete before the old one is deleted, or
+  replaced via `"wt"` from the complete copy). Cross-provider atomic replace is not
+  available and not claimed; a crash between the two steps can leave both files.
+* `"w"` is never relied on to truncate an existing document.
+* SAF trees: Android 11+ refuses the storage root, Download root, some SD card roots and
+  `Android/data|obb` in the picker; DropFiler does not work around it.
+* Persisted grants are limited per app (128 before Android 11, 512 after); hitting the
+  limit is reported as "not given lasting access".
+* Downloads run in the share sheet's process (no DownloadManager). If Android kills the
+  process mid-download, the pending/partial item is removed by DropFiler on failure or,
+  for MediaStore, expires as a pending item.
+
+### Verification
+
+Performed in this environment (Linux container, no emulator/KVM):
+
+* `./gradlew assembleDebug lintDebug testDebugUnitTest` (results in the pull request).
+* `aapt2 dump badging` of the debug APK: package `fjm.sh.dropfiler`, `targetSdkVersion:'36'`,
+  `sdkVersion:'21'`, storage permissions with `maxSdkVersion='28'`.
+* Robolectric suites with simulated providers (see README, "Testing").
+
+**Not performed:** instrumented tests, real MediaProvider / DocumentsUI / persisted grant
+behaviour, SD card or cloud providers, OEM (HyperOS) builds, multi-GB files, low storage on
+a real device. These need device testing before release.
+
