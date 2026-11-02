@@ -189,18 +189,18 @@ root). Its path data is used unchanged in a single vector, which every icon belo
 
 | Resource | Notes |
 | --- | --- |
-| `app/src/main/res/drawable/ic_dropfiler_symbol.xml` | The symbol as a VectorDrawable (white strokes, 640 x 640 viewport centred on the artwork). Single source of the geometry |
+| `app/src/main/res/drawable/ic_dropfiler_symbol.xml` | The symbol as a VectorDrawable (light-blue `#A9C6FF` strokes, 640 x 640 viewport centred on the artwork). Single source of the geometry |
 | `app/src/main/res/mipmap-anydpi-v26/ic_launcher.xml`, `ic_launcher_round.xml` | Adaptive icon (Android 8+): background, foreground and monochrome layers |
-| `app/src/main/res/values/ic_launcher_background.xml` | Solid charcoal background, `#242424` |
-| `app/src/main/res/drawable-v26/ic_launcher_foreground.xml` | The white symbol inset 27.5% on the 108 dp canvas: 48.6 dp wide, farthest stroke 30.2 dp from the centre, inside the 33 dp safe-zone radius |
+| `app/src/main/res/values/ic_launcher_background.xml` | Solid dark-blue background `#1E2A43` and the symbol colour `#A9C6FF`: the dark-theme folder tile and folder glyph colours |
+| `app/src/main/res/drawable-v26/ic_launcher_foreground.xml` | The light-blue symbol inset 27.5% on the 108 dp canvas: 48.6 dp wide, farthest stroke 30.2 dp from the centre, inside the 33 dp safe-zone radius |
 | `app/src/main/res/drawable-v26/ic_launcher_monochrome.xml` | Same layer for themed icons (Android 13+); the system recolours it |
-| `app/src/main/res/mipmap-{mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi}/ic_launcher.png`, `ic_launcher_round.png` | Legacy icons for Android 5-7 (48, 72, 96, 144, 192 px): charcoal rounded square / circle with the white symbol, rendered from the SVG paths |
+| `app/src/main/res/mipmap-{mdpi,hdpi,xhdpi,xxhdpi,xxxhdpi}/ic_launcher.png`, `ic_launcher_round.png` | Legacy icons for Android 5-7 (48, 72, 96, 144, 192 px): dark-blue rounded square / circle with the light-blue symbol, rendered from the SVG paths |
 | `app/src/main/ic_launcher_web.png`, `playstore/` | 512 px store icon and listing artwork, still Phone Saver's |
 
 The main screen shows the same vector before the "DropFiler" title (`ui/AppBarTitleIcon.kt`),
-tinted with `?attr/fsColorTitleIcon`: the primary accent `?attr/fsColorAccent` (the default blue,
-or the Monet accent when dynamic colors are on), except in the dark theme with dynamic colors,
-where it uses one tone lighter of the same accent for contrast. The Credits screen shows
+tinted with `?attr/fsColorTitleIcon`, which is `?attr/fsColorOnAccentContainer`: the same colour as
+the folder icons in the destination list (`#A9C6FF` in the dark theme, `#1A5FD0` in the light theme,
+or the matching Monet tone when dynamic colors are on). The Credits screen shows
 `@mipmap/ic_launcher`, so it updates with the launcher icon.
 
 ## Storage

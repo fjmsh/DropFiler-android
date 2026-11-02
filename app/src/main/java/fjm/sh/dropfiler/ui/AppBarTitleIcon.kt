@@ -27,9 +27,8 @@ import kotlin.math.roundToInt
  * screen readers, so the title is still read once, as plain text.
  *
  * The icon is tinted with a theme colour attribute, by default ?attr/fsColorTitleIcon. That is
- * ?attr/fsColorAccent, the primary accent which ThemeHelper swaps for the Monet palette when
- * dynamic colours are enabled; only the dark dynamic overlay picks a lighter tone of the same
- * accent for contrast. Theme changes recreate the activity (see BaseActivity), so the tint is
+ * ?attr/fsColorOnAccentContainer, the colour of the folder icons in the destination list, which
+ * ThemeHelper swaps for the Monet palette when dynamic colours are enabled. Theme changes recreate the activity (see BaseActivity), so the tint is
  * resolved again on creation.
  */
 object AppBarTitleIcon {

@@ -4,9 +4,9 @@
 	root). The path data and stroke attributes are copied unchanged from the SVG; the group only
 	moves the artwork so the 640 x 640 viewport is centred on its stroked bounds (630 x 586 units).
 
-	Single source of the icon geometry: the main screen title tints it with ?attr/fsColorAccent,
-	the adaptive launcher foreground draws it white and the themed (monochrome) launcher icon
-	lets the system recolour it. Keep colour out of this file other than the opaque white stroke.
+	Single source of the icon geometry: the main screen title tints it with ?attr/fsColorTitleIcon,
+	the adaptive launcher foreground draws it in its own stroke colour (@color/ic_launcher_foreground)
+	and the themed (monochrome) launcher icon uses only its alpha. Keep the strokes opaque.
 -->
 <vector xmlns:android="http://schemas.android.com/apk/res/android"
 	android:width="24dp"
@@ -22,7 +22,7 @@
 		<path
 			android:pathData="M368 309 V292 C368 261 392 238 424 238 H513 C540 238 549 247 567 272 L581 290 C591 302 607 306 625 306 H731 C772 306 805 339 805 380 V552 C805 582 791 607 766 619"
 			android:strokeWidth="43"
-			android:strokeColor="#FFFFFFFF"
+			android:strokeColor="@color/ic_launcher_foreground"
 			android:strokeLineCap="round"
 			android:strokeLineJoin="round" />
 
@@ -30,7 +30,7 @@
 		<path
 			android:pathData="M291 404 V381 C291 352 314 332 344 332 H444 C468 332 484 343 498 363 L513 385 C522 398 536 399 556 399 H668 C710 399 736 429 736 470 V635 C736 664 724 689 702 702"
 			android:strokeWidth="43"
-			android:strokeColor="#FFFFFFFF"
+			android:strokeColor="@color/ic_launcher_foreground"
 			android:strokeLineCap="round"
 			android:strokeLineJoin="round" />
 
@@ -38,7 +38,7 @@
 		<path
 			android:pathData="M218 632 V478 C218 448 243 428 273 428 H367 C394 428 406 438 423 462 L442 482 C450 492 464 494 480 494 H605 C648 494 663 523 663 558 V720 C663 758 637 781 598 781 H277 C244 781 220 757 220 724 V700"
 			android:strokeWidth="43"
-			android:strokeColor="#FFFFFFFF"
+			android:strokeColor="@color/ic_launcher_foreground"
 			android:strokeLineCap="round"
 			android:strokeLineJoin="round" />
 
@@ -46,7 +46,7 @@
 		<path
 			android:pathData="M218 632 C218 648 229 658 244 658 H445"
 			android:strokeWidth="43"
-			android:strokeColor="#FFFFFFFF"
+			android:strokeColor="@color/ic_launcher_foreground"
 			android:strokeLineCap="round"
 			android:strokeLineJoin="round" />
 
@@ -54,7 +54,7 @@
 		<path
 			android:pathData="M395 574 L474 653 Q479 658 474 663 L395 740"
 			android:strokeWidth="43"
-			android:strokeColor="#FFFFFFFF"
+			android:strokeColor="@color/ic_launcher_foreground"
 			android:strokeLineCap="round"
 			android:strokeLineJoin="round" />
 	</group>
