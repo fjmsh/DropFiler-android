@@ -11,7 +11,7 @@ import androidx.annotation.RequiresApi
 import fjm.sh.dropfiler.activity.SaverActivity
 import fjm.sh.dropfiler.util.DebugLogger
 import fjm.sh.dropfiler.util.DirectShareIcon
-import fjm.sh.dropfiler.util.LocationHelper
+import fjm.sh.dropfiler.util.DirectShareHelper
 
 /**
  * Service for creating direct share options (Android 6.0 - 9).
@@ -33,14 +33,12 @@ class LocationChooserTargetService : ChooserTargetService() {
 		log = DebugLogger(this)
 		log.d("Creating direct share targets")
 
-		return LocationHelper.destinations(this).map {
-				val name = if (it.length > targetNameMaxLength) {
-					it.substring(it.length - targetNameMaxLength)
-				} else it
-				log.d("Adding $it to targets")
+		return DirectShareHelper.targets(this).map {
+				val name = it.label.takeLast(targetNameMaxLength)
 				val extras = Bundle()
-				extras.putString(SaverActivity.DIRECT_SHARE_FOLDER, it)
-				ChooserTarget(name, Icon.createWithBitmap(DirectShareIcon.generate(this, it)), targetRanking, componentName, extras)
+				// Stable id, never a list position or path
+				extras.putString(SaverActivity.DIRECT_SHARE_DESTINATION, it.id)
+				ChooserTarget(name, Icon.createWithBitmap(DirectShareIcon.generate(this, it.label)), targetRanking, componentName, extras)
 			}.toMutableList()
 	}
 

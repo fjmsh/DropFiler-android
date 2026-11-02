@@ -7,11 +7,8 @@ import android.view.View
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import fjm.sh.dropfiler.TestSupport.context
 import fjm.sh.dropfiler.TestSupport.prefs
-import fjm.sh.dropfiler.TestSupport.root
-import fjm.sh.dropfiler.TestSupport.setDestinations
 import fjm.sh.dropfiler.activity.CreditsActivity
 import fjm.sh.dropfiler.activity.FolderListActivity
-import fjm.sh.dropfiler.activity.FolderSelectActivity
 import fjm.sh.dropfiler.activity.SaverActivity
 import fjm.sh.dropfiler.activity.SettingsActivity
 import org.junit.Assume.assumeTrue
@@ -40,9 +37,7 @@ class ScreenshotTest {
 	fun setUp() {
 		assumeTrue(System.getProperty("screenshotDir") != null)
 		outDir.mkdirs()
-		root().listFiles()?.forEach { it.deleteRecursively() }
-		prefs.edit().clear().commit()
-		de.cketti.library.changelog.ChangeLog(context).skipLogDialog()
+		TestSupport.reset()
 	}
 
 	private fun capture(activity: Activity, name: String) {
@@ -80,7 +75,12 @@ class ScreenshotTest {
 	private fun all(suffix: String) {
 		capture(Robolectric.buildActivity(FolderListActivity::class.java).setup().get(), "01-empty$suffix")
 
-		setDestinations("/DCIM/Memes", "/Download", "/Pictures/Reaction images", "/Documents/Receipts")
+		val folders = TestSupport.addFolders("DCIM/Memes", "Pictures/Reaction images", "Documents/Receipts")
+		val memes = folders.first()
+		// A folder added by DropFiler 6.x, waiting to be reconnected
+		fjm.sh.dropfiler.destination.DestinationStore.write(context, folders +
+			fjm.sh.dropfiler.destination.SaveDestination(fjm.sh.dropfiler.destination.DestinationStore.legacyId("/Movies"),
+				fjm.sh.dropfiler.destination.DestinationKind.LEGACY_RECONNECT_REQUIRED, "Movies", legacyPath = "/Movies"))
 		capture(Robolectric.buildActivity(FolderListActivity::class.java).setup().get(), "02-destinations$suffix")
 
 		capture(Robolectric.buildActivity(SettingsActivity::class.java).setup().get(), "03-settings$suffix")
@@ -91,9 +91,6 @@ class ScreenshotTest {
 		menuActivity.findViewById<com.hchen.himiuix.MiuixAppBar>(R.id.appbar).toolbar.showOverflowMenu()
 		org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(1))
 		captureLatestWindow("02c-overflow-menu$suffix")
-
-		File(root(), "Alpha").mkdirs(); File(root(), "Movies").mkdirs(); File(root(), "Music").mkdirs()
-		capture(Robolectric.buildActivity(FolderSelectActivity::class.java).setup().get(), "04-folder-select$suffix")
 
 		val share = Intent(context, SaverActivity::class.java).setAction(Intent.ACTION_SEND)
 			.setType("text/plain").putExtra(Intent.EXTRA_TEXT, "Some shared text")
@@ -114,23 +111,16 @@ class ScreenshotTest {
 
 		capture(Robolectric.buildActivity(CreditsActivity::class.java).setup().get(), "06-credits$suffix")
 
-		// New folder dialog
-		val picker = Robolectric.buildActivity(FolderSelectActivity::class.java).setup().get()
-		picker.findViewById<View>(R.id.new_folder).performClick()
-		org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(2))
-		captureView(org.robolectric.shadows.ShadowDialog.getLatestDialog().window!!.decorView, "08-new-folder-dialog$suffix")
-
 		// Share sheet when the destination was deleted
-		File(root(), "DCIM/Memes").deleteRecursively()
+		TestSupport.folderFile("DCIM/Memes").deleteRecursively()
 		val missing = Robolectric.buildActivity(SaverActivity::class.java, Intent(share)
-			.putExtra(SaverActivity.DIRECT_SHARE_FOLDER, "/DCIM/Memes")).setup().get()
+			.putExtra(SaverActivity.DIRECT_SHARE_DESTINATION, memes.id)).setup().get()
 		TestSupport.waitFor { missing.findViewById<View>(R.id.list).visibility == View.VISIBLE }
 		org.robolectric.Shadows.shadowOf(android.os.Looper.getMainLooper()).idleFor(java.time.Duration.ofSeconds(2))
 		capture(missing, "09-missing-folder$suffix")
 
-		// Folder picker with dynamic colors (accent 3 "New folder" button)
+		capture(Robolectric.buildActivity(FolderListActivity::class.java).setup().get(), "10-destinations-reconnect$suffix")
 		prefs.edit().putBoolean("dynamic_colors", true).commit()
-		capture(Robolectric.buildActivity(FolderSelectActivity::class.java).setup().get(), "10-folder-select-dynamic$suffix")
 		capture(Robolectric.buildActivity(SettingsActivity::class.java).setup().get(), "11-settings-dynamic$suffix")
 		capture(Robolectric.buildActivity(FolderListActivity::class.java).setup().get(), "12-destinations-dynamic$suffix")
 		prefs.edit().putBoolean("dynamic_colors", false).commit()

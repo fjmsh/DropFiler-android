@@ -10,7 +10,7 @@ If you decide to continue using this software, it means you accept all terms and
 
 ## Information Collection And Use
 
-To function basically as intended, the app is designed to only request storage permission. Turning on this permission is to allow the software to read device storage and also modify storage content. Any information that may be collected with the enablement of this permission is locally stored on your device in which the software is installed and there is no means any of that information can be collected by the developer.
+To function basically as intended, the app only saves where you tell it to. On Android 10 and newer it needs no storage permission: it saves new files to the Download folder through the system media store, and to folders you choose in Android's folder picker, which gives it access to those folders only. On Android 9 and older it asks for the storage permission to save to the Download folder. The app also asks for permission to show notifications about save results. The list of folders you chose is stored locally on your device and there is no means any of that information can be collected by the developer.
 
 The app is also capable of having full network access. This capability is so web content can be saved and also allow the developer to get crash reports so it can be fixed.
 

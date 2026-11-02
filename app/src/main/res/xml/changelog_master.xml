@@ -1,5 +1,13 @@
 <?xml version="1.0" encoding="utf-8"?>
 <changelog>
+	<release version="7.0.0" versioncode="38">
+		<change>New files are saved to Internal storage/Download by default, with no setup or storage permission on Android 10 and newer</change>
+		<change>Files saved earlier stay in the DropFiler folder; nothing is moved</change>
+		<change>Add destinations with the system folder picker, including SD cards and other storage apps</change>
+		<change>Folders added in earlier versions must be chosen again once: tap them on the main screen to reconnect</change>
+		<change>Links are downloaded straight into the chosen destination, with the result shown when the download has finished</change>
+		<change>Saving shows its progress and can be cancelled</change>
+	</release>
 	<release version="6.0.0" versioncode="37">
 		<change>Phone Saver is now DropFiler, a separately branded fork installed as a new app</change>
 		<change>Open with DropFiler: save a copy of a file from a file manager</change>

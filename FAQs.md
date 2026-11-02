@@ -19,23 +19,41 @@ No. DropFiler has its own application ID (`fjm.sh.dropfiler`), so it installs as
 ### How do I set up DropFiler?
 
 * Open the application
-* Use the `Add` button to select locations to save to
+* Use the `Add Destination` button and choose a folder in Android's folder picker. Repeat for
+  as many folders as you like; each is chosen once and remembered
 * Check the `Settings` to configure the application to your needs
 
 You can also share to DropFiler straight away: until you add a location, files are saved to
-the built-in `DropFiler` folder (`/DropFiler`, created when it is first used).
+the built-in **Download** destination (`Internal storage/Download`). No setup or permission
+is needed for it on Android 10 and newer.
 
-### What is the "DropFiler" save location? Can I remove it?
+### What is the "Download" save location? Can I remove it?
 
-It is a built-in destination, so there is always somewhere to save. It cannot be removed,
-but you can turn on `Hide "DropFiler" save location` in Settings to hide it while you have
-other locations. If you have no other location, it is still used. Files already saved there
-are not touched.
+It is a built-in destination, so there is always somewhere to save. It saves into the
+standard Download folder itself (not a sub folder). It cannot be removed, but you can turn
+on `Hide "Download" save location` in Settings to hide it while you have other locations
+that work. If none of them works, it is still offered.
 
-### Why can't I select my SD card?
+### I used DropFiler before. Where are my files, and why do my folders say "reconnect"?
 
-As each manufacturer manages the SD card, it is difficult to implement SD card file management in a way that works for every device. This is currently the biggest feature / bug report for DropFiler (and Phone Saver before it). 
-As a work around, you can enable the `Enable location select` setting from the settings menu. This will allow you to select a location when saving a file, and should correctly handle SD cards. 
+Files saved earlier stay in the `DropFiler` folder on your internal storage; nothing was
+moved or deleted. New files go to Download. Folders you added in older versions need to be
+chosen again once, because newer Android versions only let apps save to folders you picked
+in the system folder picker: tap the folder on the main screen and choose it again.
+
+### Why can't I select some folders, like the Download folder or the storage root?
+
+Android (11 and newer) does not let apps be given access to the root of internal storage,
+the Download folder itself, the root of some SD cards, or `Android/data`. Choose or create
+a sub folder in the picker. To save into Download itself, use the built-in Download
+destination.
+
+### Can I save to my SD card?
+
+Yes, if your device's folder picker shows the SD card: add a folder on it with `Add
+Destination`. If the card is removed, the destination is shown as not available until it
+is back. You can also enable `Choose location when saving` to pick a location for a single
+save.
 
 ### I get an "Unsupported" message. What can I do?
 
@@ -44,7 +62,7 @@ While you wait for development, you can try enabling the `Force saving` option i
 
 ### Can I create a folder in DropFiler?
 
-Yes. Use "New folder" while choosing a destination folder. DropFiler is otherwise not a file manager; use another app to rename, move or delete files. 
+Yes, where the storage supports it: Android's folder picker has a "New folder" option. DropFiler is otherwise not a file manager; use another app to rename, move or delete files. 
 
 ### Can I save multiple shared files?
 

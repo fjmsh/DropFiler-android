@@ -15,21 +15,14 @@
 	<!-- Folder list -->
 
 
-	<string name="location_select_label">* Selectionner lieu *</string>
 
 	<!-- Folder select -->
-	<string name="title_activity_folder_select">Selectionner Fichier</string>
 
 	<!-- Saving messages -->
 	<string name="toast_save_successful">Sauvegardé avec succès.</string>
-	<string name="toast_save_in_progress">Sauvegarde en cours…</string>
 	<string name="toast_save_failed">Sauvegarde échouée.</string>
-	<string name="toast_save_file_exists_overwrite">Ecrasement du fichier présent à cet endroit…</string>
 	<string name="toast_save_file_exists_fail">Impossible de sauvegarder, ce fichier existe déjà.</string>
 	<string name="toast_save_file_exists_self_abort">Abandon! Il semblerait que vous remplacez ce fichier par lui-même.</string>
-	<string name="toast_save_file_exists_self_continue">Attention! Il semblerait que vous
-		remplacez ce fichier par lui-même. Comme permi par le comportement de sauvegarde, écrasement du fichier…</string>
-	<string name="downloader_description">Sauvegarde de %1$s</string>
 
 	<!-- Debug / Error -->
 	<string name="not_supported_content_type">Type de contenu inacceptable</string>
@@ -84,14 +77,8 @@
 	</array>
 
 	<string name="pref_title_location_select">Activer la sélection de localisation</string>
-	<string name="pref_description_location_select">Activer la sélection de localisation pendant
-		la sauvegarde avec l\'interface utilisateur Android integrée. Recommandée pour sauvegarder sur une carte SD externe.
-	</string>
 
 	<string name="pref_title_register_file">Enregistrer avec scanneur de média</string>
-	<string name="pref_description_register_file">Notifier le scanneur média lorsqu\'un fichier a été
-		téléchargé. Ceci aidera à assurer que le fichier sera reconnu par les applications d\'images et de musique.
-	</string>
 
 	<string name="pref_title_lenient_regex">Utiliser une validation indulgente des noms de fichier</string>
 	<string name="pref_description_lenient_regex">Quand ce paramètre est désactivé, les noms
@@ -155,16 +142,9 @@
 	<string name="folder_list_root_folder">Racine du stockage</string>
 	<string name="folder_list_delete_description">Supprimer %1$s</string>
 	<string name="folder_list_delete_title">Supprimer cet emplacement ?</string>
-	<string name="folder_list_delete_message">%1$s n\'apparaîtra plus lors du partage. Les fichiers déjà enregistrés ne sont pas supprimés.</string>
 	<string name="folder_list_delete_confirm">Supprimer</string>
 	<string name="location_select_title">Choisir l\'emplacement à l\'enregistrement</string>
 	<string name="location_select_summary">Choisissez n\'importe quel dossier, y compris sur carte SD, avec le sélecteur de fichiers du système</string>
-	<string name="folder_select_up">Dossier parent</string>
-	<string name="folder_select_current">Dossier actuel</string>
-	<string name="folder_select_empty">Ce dossier ne contient aucun sous-dossier</string>
-	<string name="folder_select_here">Enregistrer ici</string>
-	<string name="folder_select_read_only">Lecture seule — choisissez un autre dossier</string>
-	<string name="folder_select_open_description">Ouvrir %1$s</string>
 	<string name="saver_title">Enregistrer dans</string>
 	<string name="saver_subtitle_text">Texte</string>
 	<string name="saver_subtitle_link">Lien</string>
@@ -221,26 +201,23 @@
 	</plurals>
 
 	<!-- New folder / missing destination -->
-	<string name="folder_select_new_folder">Nouveau dossier</string>
-	<string name="folder_select_new_folder_title">Nouveau dossier</string>
-	<string name="folder_select_new_folder_hint">Nom du dossier</string>
-	<string name="folder_select_new_folder_create">Créer</string>
-	<string name="folder_select_new_folder_error_empty">Saisissez un nom de dossier.</string>
-	<string name="folder_select_new_folder_error_invalid">Un nom de dossier ne peut pas contenir « / » ni être « . » ou « .. ».</string>
-	<string name="folder_select_new_folder_error_exists">Un dossier ou fichier portant ce nom existe déjà.</string>
-	<string name="folder_select_new_folder_error_failed">Impossible de créer le dossier ici.</string>
-	<string name="saver_missing_title">Dossier introuvable</string>
-	<string name="saver_missing_body">%1$s a été déplacé ou supprimé. Choisissez un autre dossier pour l\'enregistrement.</string>
 	<string name="saver_missing_choose">Autres emplacements</string>
 	<string name="saver_choose_other_folder">Choisir un autre dossier</string>
-	<string name="saver_folder_missing">%1$s · introuvable</string>
 
 	<!-- Reordering destinations -->
 	<string name="folder_list_move_up">Monter</string>
 	<string name="folder_list_move_down">Descendre</string>
 	<string name="folder_list_moved_announcement">%1$s déplacé en position %2$d sur %3$d</string>
 	<string name="folder_list_default_summary">%1$s · Emplacement par défaut</string>
-	<string name="toast_default_folder_hidden">&appname; est déjà un emplacement de sauvegarde intégré. Désactivez « Masquer l\'emplacement « &appname; » » dans les paramètres pour l\'afficher.</string>
-	<string name="pref_title_hide_default_folder">Masquer l\'emplacement « &appname; »</string>
-	<string name="pref_description_hide_default_folder">Masque le dossier &appname; intégré lorsque vous avez ajouté d\'autres emplacements de sauvegarde. S\'il n\'y en a pas d\'autres, il reste affiché.</string>
+	<!-- Storage (Download destination and system folder picker) -->
+	<string name="pref_title_hide_default_folder">Masquer l\'emplacement « Download »</string>
+	<string name="pref_description_hide_default_folder">Masque l\'emplacement Download intégré lorsque d\'autres emplacements disponibles existent. Si aucun n\'est disponible, Download reste affiché.</string>
+	<string name="saver_missing_title">Emplacement indisponible</string>
+	<string name="saver_missing_body">%1$s n\'est pas disponible pour le moment. Choisissez un autre emplacement ou reconnectez-le dans &appname;.</string>
+	<string name="saver_folder_unusable">%1$s · à reconnecter dans &appname;</string>
+	<string name="folder_list_delete_message">%1$s n\'apparaîtra plus lors du partage et &appname; renonce à son accès au dossier. Les fichiers déjà enregistrés ne sont pas supprimés.</string>
+	<string name="default_destination_label">Download</string>
+	<string name="default_destination_path">Stockage interne/Download</string>
+	<string name="upgrade_notice_title">Les nouveaux fichiers vont dans Download</string>
+	<string name="upgrade_notice_body">&appname; enregistre désormais dans %1$s par défaut. Les fichiers enregistrés auparavant restent dans le dossier DropFiler et ne sont pas déplacés. Les dossiers ajoutés auparavant doivent être choisis à nouveau une fois : touchez-les ci-dessous pour les reconnecter.</string>
 </resources>
