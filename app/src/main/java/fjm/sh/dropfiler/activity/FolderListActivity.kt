@@ -24,6 +24,7 @@ import androidx.recyclerview.widget.ItemTouchHelper
 import androidx.recyclerview.widget.RecyclerView
 import com.hchen.himiuix.springback.SpringBackLayout
 import fjm.sh.dropfiler.R
+import fjm.sh.dropfiler.destination.DestinationPaths
 import fjm.sh.dropfiler.destination.DestinationRepository
 import fjm.sh.dropfiler.destination.DestinationRepository.TreeResult
 import fjm.sh.dropfiler.destination.DestinationState
@@ -439,7 +440,8 @@ class FolderListActivity : BaseActivity(), MiuixListFragment.Host {
 
 	private fun summaryFor(destination: SaveDestination, state: DestinationState): String = when {
 		destination.duplicatesDefault -> getString(R.string.destination_state_duplicates_default)
-		state == DestinationState.READY -> destination.description ?: getString(R.string.destination_saf_summary)
+		state == DestinationState.READY ->
+			DestinationPaths.pathOf(this, destination) ?: getString(R.string.destination_saf_summary)
 		state == DestinationState.RECONNECT_REQUIRED -> getString(R.string.destination_state_reconnect,
 			destination.legacyPath?.ifBlank { "/" } ?: destination.label)
 		state == DestinationState.READ_ONLY -> getString(R.string.destination_state_read_only)

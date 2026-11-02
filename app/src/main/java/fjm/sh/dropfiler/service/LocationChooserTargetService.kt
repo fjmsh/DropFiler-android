@@ -34,7 +34,7 @@ class LocationChooserTargetService : ChooserTargetService() {
 		log.d("Creating direct share targets")
 
 		return DirectShareHelper.targets(this).map {
-				val name = it.label.takeLast(targetNameMaxLength)
+				val name = DirectShareHelper.shortLabel(it.label, targetNameMaxLength)
 				val extras = Bundle()
 				// Stable id, never a list position or path
 				extras.putString(SaverActivity.DIRECT_SHARE_DESTINATION, it.id)

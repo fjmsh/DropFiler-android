@@ -42,7 +42,9 @@ enum class DestinationState {
  * @param id Stable identity used by the share sheet, Direct Share and shortcuts. Never a
  *   list position and never a filesystem path.
  * @param treeUri The persisted `content://` tree URI for [DestinationKind.SAF_TREE].
- * @param description Friendly secondary text (e.g. the storage provider's name).
+ * @param description The storage provider's name (e.g. "Local storage"). The lists show the folder's
+ *   path instead (see [DestinationPaths]); this name is only part of it for providers whose
+ *   document ids are not paths.
  * @param legacyPath The DropFiler 6.x path this record was migrated from, kept so that old
  *   Direct Share targets / shortcuts (`folder:<path>`) still resolve to the same record.
  */

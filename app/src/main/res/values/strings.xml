@@ -245,6 +245,9 @@
 	<!-- Storage: built-in Download destination (MediaStore) and SAF folders -->
 	<string name="default_destination_label">Download</string>
 	<string name="default_destination_path">Internal storage/Download</string>
+	<!-- First part of a folder path on the device's own storage, e.g. "Internal storage/Documents" -->
+	<string name="storage_internal">Internal storage</string>
+	<string name="storage_sd_card">SD card</string>
 	<string name="destination_unnamed_folder">Folder</string>
 	<string name="destination_saf_summary">Folder chosen with the system picker</string>
 	<string name="destination_state_needs_permission">Access was removed · tap to reconnect</string>

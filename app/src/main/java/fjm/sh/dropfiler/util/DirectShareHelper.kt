@@ -35,6 +35,20 @@ object DirectShareHelper {
 	fun shortcutId(destination: SaveDestination) = SHORTCUT_PREFIX + destination.id
 
 	/**
+	 * A destination name shortened for the launcher shortcut menu and the share sheet: the
+	 * start of the name is kept ("Another Neat Folder" -> "Another Neat…"), cut at a word
+	 * boundary when that keeps at least half of the allowed length, otherwise mid-word.
+	 */
+	fun shortLabel(label: String, maxLength: Int = SHORT_LABEL_LENGTH): String {
+		val name = label.trim()
+		if (name.length <= maxLength) return name
+		val cut = name.take(maxLength - 1)
+		val space = cut.lastIndexOf(' ')
+		val kept = if (space >= maxLength / 2) cut.substring(0, space) else cut
+		return kept.trimEnd() + "…"
+	}
+
+	/**
 	 * @return The destination for a sharing shortcut id, or null if it is not one of ours or
 	 * the destination was removed. Also reports the usage so the system can rank it.
 	 */
@@ -75,7 +89,7 @@ object DirectShareHelper {
 			val shortcuts = targets(context).take(max).mapIndexed { rank, destination ->
 				val label = destination.label
 				ShortcutInfoCompat.Builder(context, shortcutId(destination))
-					.setShortLabel(label.takeLast(SHORT_LABEL_LENGTH))
+					.setShortLabel(shortLabel(label))
 					.setLongLabel(label)
 					.setIcon(IconCompat.createWithBitmap(
 						DirectShareIcon.generate(context, label, (ICON_SIZE_DP * density).toInt())))
