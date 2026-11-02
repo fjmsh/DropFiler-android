@@ -207,6 +207,8 @@
 	<string name="folder_list_delete_message">分享時將不再顯示 %1$s，且 &appname; 會放棄此資料夾的存取權。已儲存的檔案不會被刪除。</string>
 	<string name="default_destination_label">Download</string>
 	<string name="default_destination_path">內部儲存空間/Download</string>
+	<string name="storage_internal">內部儲存空間</string>
+	<string name="storage_sd_card">SD 卡</string>
 	<string name="upgrade_notice_title">新檔案現在會存到 Download</string>
 	<string name="upgrade_notice_body">&appname; 現在預設儲存到 %1$s。先前儲存的檔案仍留在 DropFiler 資料夾中，不會被移動。先前新增的資料夾需要重新選擇一次：點選下方的資料夾即可重新連結。</string>
 </resources>

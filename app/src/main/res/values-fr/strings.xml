@@ -212,6 +212,8 @@
 	<string name="folder_list_delete_message">%1$s n\'apparaîtra plus lors du partage et &appname; renonce à son accès au dossier. Les fichiers déjà enregistrés ne sont pas supprimés.</string>
 	<string name="default_destination_label">Download</string>
 	<string name="default_destination_path">Stockage interne/Download</string>
+	<string name="storage_internal">Stockage interne</string>
+	<string name="storage_sd_card">Carte SD</string>
 	<string name="upgrade_notice_title">Les nouveaux fichiers vont dans Download</string>
 	<string name="upgrade_notice_body">&appname; enregistre désormais dans %1$s par défaut. Les fichiers enregistrés auparavant restent dans le dossier DropFiler et ne sont pas déplacés. Les dossiers ajoutés auparavant doivent être choisis à nouveau une fois : touchez-les ci-dessous pour les reconnecter.</string>
 </resources>

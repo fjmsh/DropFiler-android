@@ -118,6 +118,8 @@
 	<string name="folder_list_delete_message">%1$s は共有時に表示されなくなり、&appname; はこのフォルダへのアクセスを解除します。保存済みのファイルは削除されません。</string>
 	<string name="default_destination_label">Download</string>
 	<string name="default_destination_path">内部ストレージ/Download</string>
+	<string name="storage_internal">内部ストレージ</string>
+	<string name="storage_sd_card">SD カード</string>
 	<string name="upgrade_notice_title">新しいファイルは Download に保存されます</string>
 	<string name="upgrade_notice_body">&appname; は既定で %1$s に保存するようになりました。以前に保存したファイルは DropFiler フォルダに残り、移動されません。以前に追加したフォルダは一度選び直す必要があります。下のフォルダをタップして再接続してください。</string>
 </resources>

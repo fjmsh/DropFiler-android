@@ -21,6 +21,7 @@ import androidx.preference.PreferenceManager
 import androidx.recyclerview.widget.LinearLayoutManager
 import androidx.recyclerview.widget.RecyclerView
 import fjm.sh.dropfiler.R
+import fjm.sh.dropfiler.destination.DestinationPaths
 import fjm.sh.dropfiler.destination.DestinationRepository
 import fjm.sh.dropfiler.destination.DestinationState
 import fjm.sh.dropfiler.destination.SaveDestination
@@ -258,8 +259,7 @@ class SaverActivity : BaseActivity() {
 	private fun destinationRow(destination: SaveDestination, state: DestinationState?): CardItem.Row {
 		val usable = state == DestinationState.READY || (destination.isDefault && state == DestinationState.NEEDS_PERMISSION)
 		val name = destination.label.ifBlank { getString(R.string.folder_list_root_folder) }
-		val summary = if (destination.isDefault) getString(R.string.default_destination_path)
-			else destination.description ?: getString(R.string.destination_saf_summary)
+		val summary = DestinationPaths.pathOf(this, destination) ?: getString(R.string.destination_saf_summary)
 		return CardItem.Row(
 			key = KEY_DESTINATION_PREFIX + destination.id,
 			title = name,
