@@ -6,6 +6,7 @@ import android.graphics.Color
 import android.graphics.drawable.AdaptiveIconDrawable
 import android.graphics.drawable.ColorDrawable
 import android.graphics.drawable.Drawable
+import android.graphics.drawable.GradientDrawable
 import android.os.Build
 import android.widget.TextView
 import androidx.core.widget.TextViewCompat
@@ -13,6 +14,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.hchen.himiuix.MiuixAppBar
 import fjm.sh.dropfiler.TestSupport.context
 import fjm.sh.dropfiler.TestSupport.prefs
+import fjm.sh.dropfiler.activity.CreditsActivity
 import fjm.sh.dropfiler.activity.FolderListActivity
 import fjm.sh.dropfiler.ui.AppBarTitleIcon
 import fjm.sh.dropfiler.util.ThemeHelper
@@ -138,5 +140,19 @@ class AppIconTest {
 	fun launcherIcon_usesLegacyBitmapsBeforeAndroid8() {
 		assertTrue(context.getDrawable(R.mipmap.ic_launcher) is android.graphics.drawable.BitmapDrawable)
 		assertTrue(context.getDrawable(R.mipmap.ic_launcher_round) is android.graphics.drawable.BitmapDrawable)
+	}
+
+	@Test
+	@Config(sdk = [28, 36])
+	fun aboutLogo_usesIconTileCornerRatio() {
+		val activity = Robolectric.buildActivity(CreditsActivity::class.java).setup().get()
+		val logo = activity.findViewById<android.widget.ImageView>(R.id.credits_logo)
+		val tile = logo.background as GradientDrawable
+		val res = context.resources
+		val logoRatio = tile.cornerRadius / res.getDimension(R.dimen.fs_logo_size)
+		val tileRatio = res.getDimension(R.dimen.fs_icon_tile_radius) / res.getDimension(R.dimen.fs_icon_tile)
+		assertEquals(tileRatio, logoRatio, 0.001f)
+		assertEquals(0xFF1E2A43.toInt(), tile.color!!.defaultColor)
+		assertNotNull(logo.drawable)
 	}
 }

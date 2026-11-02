@@ -200,8 +200,9 @@ root). Its path data is used unchanged in a single vector, which every icon belo
 The main screen shows the same vector before the "DropFiler" title (`ui/AppBarTitleIcon.kt`),
 tinted with `?attr/fsColorTitleIcon`, which is `?attr/fsColorOnAccentContainer`: the same colour as
 the folder icons in the destination list (`#A9C6FF` in the dark theme, `#1A5FD0` in the light theme,
-or the matching Monet tone when dynamic colors are on). The Credits screen shows
-`@mipmap/ic_launcher`, so it updates with the launcher icon.
+or the matching Monet tone when dynamic colors are on). The Credits (About) screen
+shows the same symbol on the launcher background colour (`drawable/fs_logo_tile.xml`), as a rounded
+square with the corner ratio of the main screen's icon tiles (30%) rather than the launcher mask.
 
 ## Storage
 

@@ -36,4 +36,9 @@
 	<dimen name="fs_empty_illustration">96dp</dimen>
 	<dimen name="fs_sheet_max_width">560dp</dimen>
 	<dimen name="fs_logo_size">88dp</dimen>
+	<!-- Same corner ratio as the destination icon tiles (12dp on 40dp = 30%) -->
+	<dimen name="fs_logo_radius">26.4dp</dimen>
+	<!-- Symbol inset matching the adaptive launcher icon: its 48.6dp symbol box on the 72dp
+		 visible area leaves 16.25% on each side -->
+	<dimen name="fs_logo_padding">14.3dp</dimen>
 </resources>
