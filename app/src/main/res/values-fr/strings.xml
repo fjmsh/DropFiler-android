@@ -38,10 +38,10 @@
 	<string name="credits_version">v%1$s</string>
 	<string name="title_activity_credits">A propos de &appname;</string>
 	<string name="logo_description">Logo</string>
-	<string name="credits_creator">Enregistrez partout. Organisez sans effort.\n\nUn utilitaire Android moderne d\'enregistrement de fichiers</string>
-	<string name="credits_content1">&appname; est une application simple pour enregistrer des copies de fichiers sur votre téléphone via les fonctions « partager » et « ouvrir ».</string>
+	<string name="credits_creator">Un utilitaire moderne d\'enregistrement et d\'organisation de fichiers</string>
+	<string name="credits_content1">&appname; est une application pour enregistrer des copies de fichiers dans des dossiers présélectionnés de votre téléphone, via les fonctions « partager » et « ouvrir ».</string>
 	<string name="credits_content2">&appname; est un fork de Phone Saver, développé à l\'origine par &author;. Le projet original est disponible sur <a href="https://github.com/ScreamingHawk/phone-saver">github.com/ScreamingHawk/phone-saver</a>.</string>
-	<string name="credits_content3">Cette application est open source ; elle est distribuée sous <a href="https://tldrlegal.com/license/mit-license">licence MIT</a>.</string>
+	<string name="credits_content3">Cette application est open source, distribuée sous <a href="https://tldrlegal.com/license/mit-license">licence MIT</a>.</string>
 	<string name="credits_content_translator">Cette traduction de Phone Saver a été proposée par
 		<a href="https://github.com/Paulao17">Paul Alnet</a>.
 	</string>
@@ -156,7 +156,7 @@
 	<string name="pref_title_about">À propos de &appname;</string>
 	<string name="credits_section_about">À propos</string>
 	<string name="credits_section_licenses">Licences open source</string>
-	<string name="credits_miuix_body">Composants d\'interface par HChenX, sous licence <a href="https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html">GNU LGPL 2.1</a>. Source : <a href="https://github.com/fjmsh/miuix-xml">github.com/fjmsh/miuix-xml</a></string>
+	<string name="credits_miuix_body">Composants d\'interface XML de style Miuix par HChenX, sous licence <a href="https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html">GNU LGPL 2.1</a>. Source : <a href="https://github.com/HChenX/HiMiuix">github.com/HChenX/HiMiuix</a></string>
 	<string name="credits_libraries_title">Autres bibliothèques</string>
 	<string name="credits_libraries_body">AndroidX (Apache 2.0), Gson (Apache 2.0), ckChangeLog (Apache 2.0), Kotlin (Apache 2.0).</string>
 	<string name="dialog_negative">Annuler</string>
