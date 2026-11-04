@@ -18,7 +18,8 @@ rootProject.name = 'DropFiler-Android'
 
 include ':app'
 
-// Miuix XML (HiMiuix) UI library, tracked as a git submodule.
-// Run `git submodule update --init` after cloning.
+// Miuix XML (HiMiuix) UI library. Its source is vendored in this repository under
+// miuix-xml/ (ordinary Git-tracked files) and built locally; no submodule or separate
+// repository is needed.
 include ':HiMiuix'
 project(':HiMiuix').projectDir = file('miuix-xml')

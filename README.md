@@ -11,7 +11,7 @@ originally developed by Michael Standen (ScreamingHawk). See [Credits](#credits)
 | App name | DropFiler |
 | Application ID | `fjm.sh.dropfiler` |
 | Developer | [fjmsh](https://github.com/fjmsh) · [fjm.dev](https://fjm.dev) · [fjm.sh](https://fjm.sh) |
-| Source | this repository (currently `fjmsh/file-saver-android`; it is planned to become `fjmsh/DropFiler-Android`) |
+| Source | this repository ([`fjmsh/DropFiler-android`](https://github.com/fjmsh/DropFiler-android)) |
 
 DropFiler is not (yet) published on Google Play or F-Droid. The store listings for
 `link.standen.michael.phonesaver` belong to the original Phone Saver app.
@@ -106,16 +106,25 @@ the destination row layout (`app/src/main/res/layout/fs_item_row.xml`).
 
 ### Integration
 
-The library is included as a git submodule (`miuix-xml/`) and built as the Gradle module
-`:HiMiuix`, as recommended by the library. Clone with submodules:
+The library's source is included directly in this repository under `miuix-xml/` and is
+built locally as the Gradle module `:HiMiuix` (`implementation project(':HiMiuix')`). A
+normal clone or a GitHub source ZIP is enough; no submodule initialisation and no access to
+another repository is needed:
 
 ```shell
-git clone --recurse-submodules https://github.com/fjmsh/file-saver-android.git
-# or, in an existing clone
-git submodule update --init
+git clone https://github.com/fjmsh/DropFiler-android.git
+cd DropFiler-android
+./gradlew assembleDebug
 ```
 
-The submodule is pinned to a specific commit, so builds are reproducible.
+Provenance: the vendored copy was taken from
+[`fjmsh/miuix-xml`](https://github.com/fjmsh/miuix-xml) at commit
+`c7af21c3d6c122a87b96bf0a1b740ed9ad8e0a92` (previously the pinned submodule commit), which
+is a fork of [HChenX/HiMiuix](https://github.com/HChenX/HiMiuix) with DropFiler's
+compatibility fixes (see `miuix-xml/README.md`). That repository is no longer maintained or
+synchronised and is not a build dependency; changes to the library are now made directly in
+`miuix-xml/`. This embedded copy is a stop-gap until a possible future Jetpack Compose
+migration.
 
 ### Blur
 
@@ -298,7 +307,7 @@ See [MIGRATION.md](MIGRATION.md).
 
 ## Feature requests and bugs
 
-Please use the [issues of this repository](https://github.com/fjmsh/file-saver-android/issues).
+Please use the [issues of this repository](https://github.com/fjmsh/DropFiler-android/issues).
 For problems that also affect the original app, see
 [Phone Saver's issues](https://github.com/ScreamingHawk/phone-saver/issues).
 
@@ -309,10 +318,13 @@ DropFiler is a separately branded fork of Phone Saver, originally developed by
 available at https://github.com/ScreamingHawk/phone-saver. Original code remains subject
 to its applicable [MIT License](LICENSE); the copyright notice in `LICENSE` is kept unchanged.
 
-The user interface uses [Miuix XML / HiMiuix](https://github.com/fjmsh/miuix-xml) by HChenX,
-licensed under the [GNU LGPL 2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html).
-It is included as a separate module (git submodule, `miuix-xml/`) with its own source
-and licence, so it can be replaced or relinked independently of the app.
+The user interface uses [Miuix XML / HiMiuix](https://github.com/HChenX/HiMiuix) by HChenX
+(via the [`fjmsh/miuix-xml`](https://github.com/fjmsh/miuix-xml) fork), licensed under the
+[GNU LGPL 2.1](https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html). Its complete
+source is included as a separate Gradle module in `miuix-xml/`, together with its own
+[licence](miuix-xml/LICENSE) and the original copyright notices, so it can be inspected,
+modified, rebuilt and replaced or relinked independently of the app. Vendoring it does not
+relicense it; the LGPL 2.1 continues to apply to that module.
 
 Other libraries: AndroidX, Gson, ckChangeLog and Kotlin (Apache 2.0).
 

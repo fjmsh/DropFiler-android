@@ -9,7 +9,7 @@ Please read the commit recommendations at the bottom of this document before sub
 ## Found a bug?
 
 Do a quick search through the [issues list][1] to make sure it hasn't already been listed.
-If not, hit the [new issue](https://github.com/fjmsh/file-saver-android/issues/new) button and add some details.
+If not, hit the [new issue](https://github.com/fjmsh/DropFiler-android/issues/new) button and add some details.
 
 Please do this even if you plan to fix it yourself.
 It's nice to track these things.
@@ -19,7 +19,7 @@ It's nice to track these things.
 Great!
 
 1. Fork the source code!
-2. Download your fork of the source code using `git clone --recurse-submodules https://github.com/<your_username>/file-saver-android.git` where `<your_username>` is your Github username.
+2. Download your fork of the source code using `git clone https://github.com/<your_username>/DropFiler-android.git` where `<your_username>` is your Github username.
 3. Open the project in [Android Studio](https://developer.android.com/studio/index.html) or another Android development environment.
 4. Make your changes.
 5. Click run.
@@ -33,8 +33,8 @@ Look forward to your fix being included!
 Yes please!
 
 1. Fork the source code!
-2. Download your fork of the source code using `git clone --recurse-submodules https://github.com/<your_username>/file-saver-android.git` where `<your_username>` is your Github username.
-3. Navigate to `file-saver-android/app/src/main/res`
+2. Download your fork of the source code using `git clone https://github.com/<your_username>/DropFiler-android.git` where `<your_username>` is your Github username.
+3. Navigate to `DropFiler-android/app/src/main/res`
 4. Create a new directory named `values-<language_code>` where `<language_code>` is the code from [ISO 639.1][2]. e.g. `values-it` for Italian
 5. Copy `values/strings.xml` into your new `values-<language_code>` directory.
 6. Translate each of the resource strings into your language. (Please do not translate or alter the links, the author name or the original app name "Phone Saver" in attribution texts).
@@ -45,7 +45,7 @@ Thanks a lot for this!
 
 ## Got an idea for a fancy feature?
 
-Request your feature by [creating a ticket](https://github.com/fjmsh/file-saver-android/issues/new).
+Request your feature by [creating a ticket](https://github.com/fjmsh/DropFiler-android/issues/new).
 
 DropFiler is intended to be simplistic and minimal, so features are subject to approval.
 
@@ -53,5 +53,5 @@ DropFiler is intended to be simplistic and minimal, so features are subject to a
 
 To anyone who even looks at this page!!!
 
-[1]: https://github.com/fjmsh/file-saver-android/issues
+[1]: https://github.com/fjmsh/DropFiler-android/issues
 [2]: http://www.loc.gov/standards/iso639-2/php/code_list.php

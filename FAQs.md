@@ -91,6 +91,6 @@ Phone Saver, which DropFiler is based on, has had many contributors. Changes are
 
 ### I have some questions not contained in this FAQs document, how can I contact the developer?
 
-Please [open an issue](https://github.com/fjmsh/file-saver-android/issues/new) on this repository. You can also find the developer at [fjm.dev](https://fjm.dev).
+Please [open an issue](https://github.com/fjmsh/DropFiler-android/issues/new) on this repository. You can also find the developer at [fjm.dev](https://fjm.dev).
 
 Please do not contact the original Phone Saver developer about DropFiler.

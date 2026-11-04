@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="utf-8"?>
+<merge xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content">
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_gravity="center"
+        android:gravity="center"
+        android:orientation="horizontal">
+
+        <!-- 右侧容器 -->
+        <LinearLayout
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:gravity="center"
+            android:orientation="horizontal">
+
+            <!-- tip 视图 -->
+            <com.hchen.himiuix.widget.MiuixTextView
+                android:id="@id/miuix_tip"
+                style="@style/MiuixTipStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/miuix_tip_margin"
+                android:maxWidth="@dimen/miuix_tip_max_width"
+                tools:text="Test Tip" />
+
+            <!-- 指示器集合 -->
+            <ViewStub
+                android:id="@id/miuix_dynamic_indicator_stub"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="@dimen/miuix_indicator_margin_end" />
+        </LinearLayout>
+
+        <!-- content 视图 -->
+        <LinearLayout
+            android:layout_width="0dp"
+            android:layout_height="wrap_content"
+            android:layout_weight="1"
+            android:orientation="vertical">
+
+            <com.hchen.himiuix.widget.MiuixTextView
+                android:id="@id/miuix_title"
+                style="@style/MiuixTitleStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Test Title" />
+
+            <TextView
+                android:id="@id/miuix_summary"
+                style="@style/MiuixSummaryStyle"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                tools:text="Test Summary" />
+        </LinearLayout>
+
+        <!-- icon 视图 -->
+        <androidx.cardview.widget.CardView
+            android:id="@id/miuix_icon_card"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginStart="@dimen/miuix_icon_margin"
+            app:cardBackgroundColor="@android:color/transparent"
+            app:cardElevation="0dp"
+            app:cardPreventCornerOverlap="false"
+            app:cardUseCompatPadding="false">
+
+            <ImageView
+                android:id="@id/miuix_icon"
+                style="@style/MiuixIconStyle"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:maxWidth="@dimen/miuix_basic_icon_min"
+                tools:ignore="ContentDescription"
+                tools:src="@drawable/ic_default_icon" />
+        </androidx.cardview.widget.CardView>
+    </LinearLayout>
+
+    <!-- margin 视图 -->
+    <View
+        android:id="@id/miuix_margin_view"
+        android:layout_width="match_parent"
+        android:layout_height="@dimen/miuix_basic_margin_height"
+        android:layout_marginBottom="@dimen/miuix_basic_margin"
+        android:clickable="false"
+        android:focusable="false" />
+
+    <!-- 自定义视图 -->
+    <LinearLayout
+        android:id="@id/miuix_custom_view"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:orientation="vertical" />
+</merge>
