@@ -46,10 +46,10 @@
 	<string name="credits_version">v%1$s</string>
 	<string name="title_activity_credits">About &appname;</string>
 	<string name="logo_description">Logo</string>
-	<string name="credits_creator">Save anywhere. Organize effortlessly.\n\nA modern Android file-saving utility</string>
-	<string name="credits_content1">&appname; is a simple application for saving copies of files to your phone through the file \"share\" and \"open\" functions.</string>
+	<string name="credits_creator">A modern file-saving organizer utility</string>
+	<string name="credits_content1">&appname; is an app for saving copies of files to pre-selected folders on your phone, via the file \"share\" and \"open\" functions.</string>
 	<string name="credits_content2">&appname; is a fork of Phone Saver, originally developed by &author;. The original project is available at <a href="https://github.com/ScreamingHawk/phone-saver">github.com/ScreamingHawk/phone-saver</a>.</string>
-	<string name="credits_content3">This application is open-source; it is licensed under the <a href="https://tldrlegal.com/license/mit-license">MIT license</a>.</string>
+	<string name="credits_content3">This application is open-source, licensed under the <a href="https://tldrlegal.com/license/mit-license">MIT license</a>.</string>
 	<string name="credits_content_translator">This translation of Phone Saver was provided by
 		<a href="https://michael.standen.link">&author;</a>.
 	</string>
@@ -137,7 +137,7 @@
 
 
 	<!-- Change log -->
-	<string name="changelog_full_title">Change Log</string>
+	<string name="changelog_full_title">Changelog</string>
 	<string name="changelog_title">What\'s New</string>
 	<string name="changelog_ok_button">OK</string>
 	<string name="changelog_show_full">Show all&#8230;</string>
@@ -196,12 +196,12 @@
 
 	<!-- Credits -->
 	<string name="credits_section_about">About</string>
-	<string name="credits_section_licenses">Open source licences</string>
-	<string name="credits_miuix_title" translatable="false">Miuix XML (HiMiuix)</string>
-	<string name="credits_miuix_body">User interface components by HChenX, licensed under the
+	<string name="credits_section_licenses">Open-Source Licenses</string>
+	<string name="credits_miuix_title" translatable="false">HiMiuix</string>
+	<string name="credits_miuix_body">Miuix-style XML UI components by HChenX, licensed under the
 		<a href="https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html">GNU LGPL 2.1</a>.
-		Source: <a href="https://github.com/fjmsh/miuix-xml">github.com/fjmsh/miuix-xml</a></string>
-	<string name="credits_libraries_title">Other libraries</string>
+		Source: <a href="https://github.com/HChenX/HiMiuix">github.com/HChenX/HiMiuix</a></string>
+	<string name="credits_libraries_title">Other Libraries</string>
 	<string name="credits_libraries_body">AndroidX (Apache 2.0), Gson (Apache 2.0), ckChangeLog (Apache 2.0), Kotlin (Apache 2.0).</string>
 
 	<!-- Overrides of Miuix XML default strings (the library ships Chinese only) -->

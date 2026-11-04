@@ -29,8 +29,8 @@
 	<string name="credits_version">v%1$s</string>
 	<string name="title_activity_credits">&appname; について</string>
 	<string name="logo_description">ロゴ</string>
-	<string name="credits_creator">どこにでも保存。手間なく整理。\n\nモダンな Android ファイル保存ユーティリティ</string>
-	<string name="credits_content1">&appname; は、ファイルの「共有」機能と「開く」機能を通じて、ファイルのコピーを電話に保存するためのシンプルなアプリケーションです。</string>
+	<string name="credits_creator">モダンなファイル保存・整理ユーティリティ</string>
+	<string name="credits_content1">&appname; は、ファイルの「共有」機能と「開く」機能を通じて、ファイルのコピーを電話内のあらかじめ選んだフォルダに保存するアプリです。</string>
 	<string name="credits_content2">&appname; は、&author; が開発した Phone Saver のフォークです。オリジナルのプロジェクトは <a href="https://github.com/ScreamingHawk/phone-saver">github.com/ScreamingHawk/phone-saver</a> で公開されています。</string>
 	<string name="credits_content3">このアプリケーションはオープンソースで、<a href="https://tldrlegal.com/license/mit-license">MIT ライセンス</a> でライセンスされています。</string>
 	<string name="credits_content_translator">この Phone Saver の翻訳は
@@ -64,7 +64,7 @@
 	<string name="pref_title_about">&appname; について</string>
 	<string name="credits_section_about">情報</string>
 	<string name="credits_section_licenses">オープンソースライセンス</string>
-	<string name="credits_miuix_body">UI コンポーネント: HChenX（<a href="https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html">GNU LGPL 2.1</a>）。ソース: <a href="https://github.com/fjmsh/miuix-xml">github.com/fjmsh/miuix-xml</a></string>
+	<string name="credits_miuix_body">Miuix スタイルの XML UI コンポーネント: HChenX（<a href="https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html">GNU LGPL 2.1</a>）。ソース: <a href="https://github.com/HChenX/HiMiuix">github.com/HChenX/HiMiuix</a></string>
 	<string name="credits_libraries_title">その他のライブラリ</string>
 	<string name="credits_libraries_body">AndroidX (Apache 2.0)、Gson (Apache 2.0)、ckChangeLog (Apache 2.0)、Kotlin (Apache 2.0)。</string>
 	<string name="dialog_negative">キャンセル</string>

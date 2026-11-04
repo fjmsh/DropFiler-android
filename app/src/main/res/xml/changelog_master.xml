@@ -2,199 +2,22 @@
 <changelog>
 	<release version="7.0.0" versioncode="38">
 		<change>New files are saved to Internal storage/Download by default, with no setup or storage permission on Android 10 and newer</change>
-		<change>Files saved earlier stay in the DropFiler folder; nothing is moved</change>
 		<change>Add destinations with the system folder picker, including SD cards and other storage apps</change>
-		<change>Folders added in earlier versions must be chosen again once: tap them on the main screen to reconnect</change>
 		<change>Links are downloaded straight into the chosen destination, with the result shown when the download has finished</change>
 		<change>Saving shows its progress and can be cancelled</change>
 	</release>
 	<release version="6.0.0" versioncode="37">
-		<change>Phone Saver is now DropFiler, a separately branded fork installed as a new app</change>
+		<change>Phone Saver is now DropFiler - a modernized fork of "Phone Saver".</change>
 		<change>Open with DropFiler: save a copy of a file from a file manager</change>
-		<change>Built-in "DropFiler" save location, so sharing works before adding any (can be hidden in Settings)</change>
-		<change>New HyperOS-inspired design built with Miuix XML</change>
+		<change>New HyperOS-inspired design built with HiMiuix</change>
 		<change>Light and dark themes, plus optional dynamic colors on Android 12+</change>
 		<change>Grouped settings and a quicker share destination sheet</change>
 		<change>Direct Share on Android 10 and newer</change>
 		<change>Confirmation before removing a destination</change>
 	</release>
-	<release version="5.2.0" versioncode="36">
+	<!-- The version text is shown as the heading ("v" + version), so the date is part of it. -->
+	<release version="5.2.0 (Oct 13, 2019)" versioncode="36">
+		<change>Last version of the original "Phone Saver" app.</change>
 		<change>So long and thanks for all the fish!</change>
-	</release>
-	<release version="5.1.1" versioncode="35">
-		<change>Fix issue where folder list does not update after deletes</change>
-	</release>
-	<release version="5.1.0" versioncode="34">
-		<change>Add ability to follow redirects</change>
-	</release>
-	<release version="5.0.0" versioncode="33">
-		<change>Add special handling for links from Imgur</change>
-	</release>
-	<release version="4.1.1" versioncode="32">
-		<change>Actually finally fixed append number saving strategy!!!</change>
-	</release>
-	<release version="4.1.0" versioncode="31">
-		<change>Further fixes to append number saving strategy</change>
-		<change>Update Chinese translation</change>
-		<change>Code niceties</change>
-	</release>
-	<release version="4.0.3" versioncode="30">
-		<change>Fix append number saving strategy</change>
-		<change>Add direct share capability (beta)</change>
-		<change>Optimise preference loading and management</change>
-		<change>Code niceties</change>
-	</release>
-	<release version="4.0.2" versioncode="29">
-		<change>Fix download using select location for URLs</change>
-		<change>Fix folder list display when select location is enabled</change>
-		<change>Fix filename when URL title begins with a space</change>
-		<change>Fix crash when debug mode is enabled</change>
-		<change>Fix typo in change log</change>
-		<change>Code niceties</change>
-	</release>
-	<release version="4.0.1" versioncode="28">
-		<change>Fix saving locations after deleting a location</change>
-	</release>
-	<release version="4.0.0" versioncode="27">
-		<change>Add setting to select location during save</change>
-		<change>The above setting should work for users with external SD cards</change>
-		<change>Add notification when saving a file over itself, if detected</change>
-		<change>Refactored backend</change>
-		<change>Fixed potential memory leak</change>
-		<change>Updated version pattern to semantic versioning</change>
-	</release>
-	<release version="3.9" versioncode="26">
-		<change>Add ability to see logging information</change>
-	</release>
-	<release version="3.8" versioncode="25">
-		<change>Update build tools to better support LineageOS</change>
-	</release>
-	<release version="3.7" versioncode="24">
-		<change>Fix stream writer logic again. Thanks / Sorry brarcher!</change>
-	</release>
-	<release version="3.6" versioncode="23">
-		<change>Fix stream writer logic. Thanks brarcher!</change>
-		<change>Support all "text/" based mime types</change>
-		<change>Code niceties</change>
-	</release>
-	<release version="3.5" versioncode="22">
-		<change>Add setting to allow a wider range of characters in saved filenames. This supports emoji and other languages</change>
-		<change>Fix media scanner usage. Thanks amtlib-dot-dll!</change>
-		<change>Fix filename validation</change>
-		<change>Add mime type validation</change>
-	</release>
-	<release version="3.4" versioncode="21">
-		<change>Add change log</change>
-	</release>
-	<release version="3.3" versioncode="20">
-		<change>Add option to register files with media scanner</change>
-		<change>Explicit audio file support</change>
-	</release>
-	<release version="3.2" versioncode="19">
-		<change>Greater support for "text" based content types</change>
-	</release>
-	<release version="3.1" versioncode="18">
-		<change>Fix crashing when performing some toasts</change>
-		<change>Add force saving setting</change>
-		<change>Further fix case sensitive content type testing</change>
-		<change>Code niceties</change>
-	</release>
-	<release version="3.0" versioncode="17">
-		<change>Fix "text/html" support</change>
-		<change>Add setting for handling files that already exist</change>
-		<change>Fix case sensitive content type testing</change>
-		<change>Fix file extension testing</change>
-	</release>
-	<release version="2.5" versioncode="16">
-		<change>Update Japanese translation</change>
-		<change>Add "text/html" support</change>
-		<change>Add translation credits</change>
-		<change>Fix handling URLs with embedded equals signs</change>
-	</release>
-	<release version="2.4" versioncode="15">
-		<change>Add "application/octet-stream" support</change>
-		<change>Make UI more consistent</change>
-		<change>Make entire folder line clickable</change>
-	</release>
-	<release version="2.3" versioncode="14">
-		<change>Update Japanese translation</change>
-		<change>Disallow selection of write protected folders</change>
-		<change>Automatically add file extensions</change>
-		<change>Make UI bigger</change>
-		<change>Fix folder title display for folder root location</change>
-		<change>Make UI consistent</change>
-		<change>Permissions test runs immediately on load</change>
-		<change>Update build and support libraries' versions</change>
-		<change>Code niceties</change>
-	</release>
-	<release version="2.2" versioncode="13">
-		<change>Add fallback for URL content type detection</change>
-	</release>
-	<release version="2.1" versioncode="12">
-		<change>Guess content type from URL connection</change>
-		<change>Fix callback error preventing downloads</change>
-		<change>Fix multiple toasts appearing when they shouldn't</change>
-		<change>Code niceties</change>
-	</release>
-	<release version="2.0" versioncode="11">
-		<change>Correct ellipse usage</change>
-		<change>Update Japanese translation</change>
-		<change>Allow incomplete translations</change>
-		<change>Increase performance for web URI requests</change>
-		<change>Fix missing callbacks</change>
-		<change>Add "testing for support" notification</change>
-		<change>Fix filename validation</change>
-		<change>Ensure "testing for support" is accurate by doing a full dry run</change>
-		<change>Code niceties</change>
-	</release>
-	<release version="1.9" versioncode="10">
-		<change>Update Japanese translation</change>
-		<change>Allow complete phone navigation</change>
-		<change>Enhance support for "text/plain"</change>
-		<change>Enhance filename validation</change>
-		<change>Code niceties</change>
-	</release>
-	<release version="1.8" versioncode="9">
-		<change>Add toast when background downloads are completed</change>
-		<change>Update Japanese translation</change>
-		<change>Add application version to support request</change>
-	</release>
-	<release version="1.7" versioncode="8">
-		<change>Add video support</change>
-		<change>Enhance filename validation</change>
-		<change>Update Kotlin version</change>
-	</release>
-	<release version="1.6" versioncode="7">
-		<change>Add support for URL requests</change>
-		<change>Enhance support request ticket generation</change>
-		<change>Update tools and support libraries versions</change>
-		<change>Code niceties</change>
-	</release>
-	<release version="1.5" versioncode="6">
-		<change>Add support request ticket generation</change>
-		<change>Update tools and support libraries to stable versions</change>
-		<change>Fix UI layout</change>
-		<change>Code niceties</change>
-	</release>
-	<release version="1.4" versioncode="5">
-		<change>Fix UI layout</change>
-	</release>
-	<release version="1.3" versioncode="4">
-		<change>Add playstore graphics</change>
-		<change>Fix UI layout</change>
-	</release>
-	<release version="1.2" versioncode="3">
-		<change>Update build tools</change>
-		<change>Add more icons</change>
-		<change>Fix folder list sorting</change>
-		<change>Fix back button behaviour</change>
-		<change>Code niceties</change>
-	</release>
-	<release version="1.1" versioncode="2">
-		<change>Update icons</change>
-		<change>Code niceties</change>
-	</release>
-	<release version="1.0" versioncode="1">
-		<change>Initial release</change>
 	</release>
 </changelog>

@@ -39,8 +39,8 @@
 	<string name="credits_version">v%1$s</string>
 	<string name="title_activity_credits">關於 &appname;</string>
 	<string name="logo_description">標誌</string>
-	<string name="credits_creator">隨處儲存，輕鬆整理。\n\n現代化的 Android 檔案儲存工具</string>
-	<string name="credits_content1">&appname; 是一個簡單的應用程式，可透過檔案的「分享」和「開啟」功能，將檔案的副本儲存到手機中。</string>
+	<string name="credits_creator">現代化的檔案儲存與整理工具</string>
+	<string name="credits_content1">&appname; 是一個應用程式，可透過檔案的「分享」和「開啟」功能，將檔案的副本儲存到手機中預先選定的資料夾。</string>
 	<string name="credits_content2">&appname; 是 Phone Saver 的分支，Phone Saver 最初由 &author; 開發。原始專案位於 <a href="https://github.com/ScreamingHawk/phone-saver">github.com/ScreamingHawk/phone-saver</a>。</string>
 	<string name="credits_content3">這個應用程式是開放原始碼的，根據 <a href="https://tldrlegal.com/license/mit-license">MIT 授權條款</a> 授權。</string>
 	<string name="credits_content_translator">Phone Saver 的翻譯由
@@ -153,7 +153,7 @@
 	<string name="pref_title_about">關於 &appname;</string>
 	<string name="credits_section_about">關於</string>
 	<string name="credits_section_licenses">開放原始碼授權</string>
-	<string name="credits_miuix_body">介面元件由 HChenX 提供，採用 <a href="https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html">GNU LGPL 2.1</a> 授權。原始碼：<a href="https://github.com/fjmsh/miuix-xml">github.com/fjmsh/miuix-xml</a></string>
+	<string name="credits_miuix_body">Miuix 風格的 XML 介面元件由 HChenX 提供，採用 <a href="https://www.gnu.org/licenses/old-licenses/lgpl-2.1.html">GNU LGPL 2.1</a> 授權。原始碼：<a href="https://github.com/HChenX/HiMiuix">github.com/HChenX/HiMiuix</a></string>
 	<string name="credits_libraries_title">其他程式庫</string>
 	<string name="credits_libraries_body">AndroidX (Apache 2.0)、Gson (Apache 2.0)、ckChangeLog (Apache 2.0)、Kotlin (Apache 2.0)。</string>
 	<string name="dialog_negative">取消</string>
