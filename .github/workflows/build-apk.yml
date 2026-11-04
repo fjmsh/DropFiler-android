@@ -13,9 +13,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4
-        with:
-          # Miuix XML is a git submodule and is required to build the app
-          submodules: recursive
 
       # Miuix XML compiles with Java 21 (the app itself targets Java 17 bytecode)
       - uses: actions/setup-java@v4

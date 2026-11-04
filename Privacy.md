@@ -59,7 +59,7 @@ DropFiler is developed in good faith to help end users copy and move and save an
 
 ## Contact Us
 
-DropFiler would certainly improve with contributions from the open source community. Feel free to make contributions and suggestions to this project either by opening an issue or implementing opening pull requests of those suggestions and improvements. For further inquiry regarding this privacy policy or any other issue relating to the development or within the circumference of DropFiler software, please open an issue on the app's repository [here](https://github.com/fjmsh/file-saver-android/issues/new) on Github. Please also check if the issue you want to open hasn't been previously open.
+DropFiler would certainly improve with contributions from the open source community. Feel free to make contributions and suggestions to this project either by opening an issue or implementing opening pull requests of those suggestions and improvements. For further inquiry regarding this privacy policy or any other issue relating to the development or within the circumference of DropFiler software, please open an issue on the app's repository [here](https://github.com/fjmsh/DropFiler-android/issues/new) on Github. Please also check if the issue you want to open hasn't been previously open.
 
 
 

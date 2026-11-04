@@ -72,7 +72,9 @@ Dependency changes:
 
 ## Miuix XML integration
 
-Added as a git submodule at `miuix-xml/` (Gradle project `:HiMiuix`). Other library fixes
+Originally added as a git submodule at `miuix-xml/` (Gradle project `:HiMiuix`); the source
+is now vendored in this repository, see
+[Miuix XML vendored as source](#miuix-xml-vendored-as-source). Other library fixes
 made while integrating (all on the same library branch):
 
 * `MiuixAppBar`: no `NullPointerException` when a nested scroll happens before the
@@ -401,3 +403,26 @@ Performed in this environment (Linux container, no emulator/KVM):
 behaviour, SD card or cloud providers, OEM (HyperOS) builds, multi-GB files, low storage on
 a real device. These need device testing before release.
 
+## Miuix XML vendored as source
+
+The `miuix-xml` git submodule was replaced by an ordinary, Git-tracked copy of the same
+source in `miuix-xml/`. A plain clone or a GitHub source ZIP now builds without
+`git submodule update --init` and without access to `fjmsh/miuix-xml`.
+
+* Source: `fjmsh/miuix-xml` commit `c7af21c3d6c122a87b96bf0a1b740ed9ad8e0a92`, the commit
+  the submodule was pinned to. The files were taken unchanged from that revision
+  (`build.gradle`, `proguard-rules.pro`, `LICENSE`, `.gitignore`, `src/main/**`); only
+  `miuix-xml/README.md` gained a note about the local integration.
+* Not copied: the library repository's `.github/` (Dependabot) and `image/miuix.jpg`
+  (a README screenshot, not used by the build).
+* Unchanged: Gradle project name `:HiMiuix`, directory `miuix-xml/`,
+  `implementation project(':HiMiuix')`, namespace `com.hchen.himiuix`, the library's build
+  configuration and dependencies, and its LGPL-2.1 licence and copyright notices.
+* `.gitmodules` was removed and the CI workflows no longer check out submodules.
+* `fjmsh/miuix-xml` is kept only as provenance; it is no longer maintained or synchronised.
+  Library changes are made directly in `miuix-xml/`. This is a stop-gap until a possible
+  future Compose migration.
+
+Existing clones may keep stale `.git/modules/miuix-xml` metadata; it is unused and can be
+deleted. If `git pull` complains about `miuix-xml`, run `git submodule deinit -f miuix-xml`
+(or remove the empty directory) before pulling.

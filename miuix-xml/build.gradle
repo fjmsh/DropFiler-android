@@ -1,0 +1,47 @@
+plugins {
+    id 'com.android.library'
+}
+
+android {
+    namespace 'com.hchen.himiuix'
+    compileSdk 36
+
+    defaultConfig {
+        // 实际 API 使用审计后，API 21 即可满足（见 README）
+        // Lowered from 29 after auditing actual API usage (see README).
+        minSdk 21
+        targetSdk 36
+
+        // 部分矢量图使用 fillType 等 API 24 特性，交由 AppCompat 处理
+        // Some vectors use API 24 attributes (e.g. fillType); let AppCompat render them.
+        vectorDrawables.useSupportLibrary = true
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            consumerProguardFiles 'proguard-rules.pro'
+        }
+
+        debug {
+            minifyEnabled false
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_21
+        targetCompatibility JavaVersion.VERSION_21
+        // java.util.stream / Optional 等 API 在 API 24 以下需要 core library desugaring
+        // java.util.stream, Optional, etc. need core library desugaring below API 24.
+        coreLibraryDesugaringEnabled true
+    }
+}
+
+dependencies {
+    coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.5'
+
+    implementation 'androidx.appcompat:appcompat:1.7.1'
+    implementation 'androidx.cardview:cardview:1.0.0'
+    implementation 'androidx.preference:preference:1.2.1'
+    implementation 'androidx.recyclerview:recyclerview:1.4.0'
+}
